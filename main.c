@@ -83,10 +83,6 @@ int weight[][22] = {
 };
 
 
-#define JAHRES_SCHLUSS   /// wichtig!!!  fürs Sommersemester definieren!
-// ???   braucht das noch wer? - warum ?
-
-
 
 typedef struct weight WEIGHT;
 struct weight
