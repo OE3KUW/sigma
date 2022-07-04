@@ -4,13 +4,14 @@
 //                                Σ i g m a
 //
 //
-//                                                               қuran jun 2022
+//                                                               қuran jul 2022
 //*****************************************************************************
 // history:
 // 2022.05 automatische Verzeichnisse für das Jahr und Monat erstellt
 // 2022.06 Abhaengig vom Monat Daten des Wintersemesters (123456) oder SS entw.
 // 2022.06 Embedded und Wireless muss noch in ein und selbe Klasse!
 // 2022.06 auch die 3AHELS braucht SigmaWerte / je nach sommer oder Winter!
+// 2022.06 erstelle Liste aller NG fuer die EL
 //*****************************************************************************
 // usage:
 // 1.)
@@ -128,12 +129,18 @@ void CutNames(char * fromFile, char * directory);
 int main(void)
 {
 FILE * liste, * listNoUnder, * tab, * fehl, * allTab, * notes, * percent, * sigmaList,
-     * protEL,    * protET,   * protIF,   * protMB,   * protWI, *sigma35, * check;
+     * protEL,    * protET,   * protIF,   * protMB,   * protWI, *sigma35, * check, * wel;
 char text[LINEMAX];
+char FamNam[LINEMAX];
+char VorNam[LINEMAX];
+
 int i, j, k, l, n, m, r, s, w,lines, nSubs, gefunden, cId, sId, numberOfMembersWith5N, numberOfMembers;
+
+int f, h;
 // int contr;
-int anzS, anzN, from, to, point, semi;
-char semiL;
+int anzS, anzN;
+//del? int semi, point;
+//del? char semiL, from, to;
 
 char compClass[12];
 char qualifier[LINEMAX];
@@ -154,7 +161,7 @@ struct tm tm = *localtime(&ti);
 char dir[LEN];
 char answer[LEN];
 char command[LEN];
-char fName[LEN];
+//del? char fName[LEN];
 
 
 int summer; // if TRUE check die Jahresnote e.g. SS   else Semesternote e.g. WS
@@ -333,6 +340,11 @@ int summer; // if TRUE check die Jahresnote e.g. SS   else Semesternote e.g. WS
     writeF(&protMB,"./Prtokoll_Unterlagen_MB.csv");
     writeF(&protWI,"./Prtokoll_Unterlagen_WI.csv");
 
+    writeF(&wel,"./Wiederholungspruefungen_EL.csv");
+
+    fprintf(wel,"2022 Juni \n");
+
+
     do   // Tab wird in tab eigelesen ... Gleichzeitig werden hier Vorgezogene Prüfungen entfernt
     {
         fgets(text, LINEMAX, tab);
@@ -453,12 +465,32 @@ int summer; // if TRUE check die Jahresnote e.g. SS   else Semesternote e.g. WS
 //contr = 1;
 //}
 //else contr = 0;
+                f = 0;
+                while(t[j][r] != ',')
+                {
+                    if(t[j][r] < 0) {s++;}
+                    fprintf(notes,"%c", t[j][r]);
+                    FamNam[f] = t[j][r];
+                    f++; r++;
+                }
+                FamNam[f] = '\0';
+                fprintf(notes,","); r++;
 
-                while(t[j][r] != ',') {if(t[j][r] < 0) {s++;} fprintf(notes,"%c", t[j][r]); r++;}  fprintf(notes,","); r++;
+
+
 
 
             // Vorname
-                while(t[j][r] != ',') {if(t[j][r] < 0) {s++;}fprintf(notes,"%c", t[j][r]); r++;}  fprintf(notes,","); r++;
+                h = 0;
+                while(t[j][r] != ',')
+                {
+                    if(t[j][r] < 0) {s++;}
+                    fprintf(notes,"%c", t[j][r]);
+                    VorNam[h] = t[j][r];
+                    h++; r++;
+                }
+                VorNam[h] = '\0';
+                fprintf(notes,","); r++;
                 sprintf(qualifier,"%s",t[j]+r);
 
                 s = (s / 2) + 50;  // Umlaute, Sonderezeichen...
@@ -509,6 +541,24 @@ int summer; // if TRUE check die Jahresnote e.g. SS   else Semesternote e.g. WS
 
                         fprintf(notes, "%s,",subs[k]);   //Gegenstand für Gegenstand wird eingetragen....
                         fprintf(notes, "%c,", qualifier[ + r + strlen(subs[k]) + 1] );
+
+// falls 5er rausschreiben
+//### Baustelle!!!
+//### Baustelle!!!
+//### Baustelle!!!
+//### Baustelle!!!
+//### Baustelle!!!
+//### Baustelle!!!
+
+                if ((nFlecks > 0) && (nFlecks < 3) && (Abt[1] == 'L') &&
+                    (((qualifier[ + r + strlen(subs[k]) + 1]) == '5') ||
+                     ((qualifier[ + r + strlen(subs[k]) + 1]) == 'N')     )
+                    )
+                {
+                    fprintf(wel,"%s;%s;%s;%s;\n", ClassName, FamNam, VorNam, subs[k]);
+                }
+
+
 
                         if ((cId >= 0) && (sId >= 0))
                         {
@@ -795,6 +845,7 @@ fclose(protWI);
 
     fclose(notes);
     fclose(allTab);
+    fclose(wel);
 
 
 
@@ -864,14 +915,22 @@ fclose(protWI);
 //                ((text[3] == '3') && (text[10] ==  'S')) ||
 //                ((text[3] == '4') && (text[10] ==  'S'))    )
 
-            if (((text[19] == '.') && (summer == FALSE))  ||   // fuer das erste Semester!
-               ((((text[3] == '1') && (text[10] ==  'J')) ||
-                ((text[3] == '2') && (text[10] ==  'S')) ||
-                ((text[3] == '3') && (text[10] ==  'S')) ||
-                ((text[3] == '4') && (text[10] ==  'S') && (text[5] == 'H'))) && (summer == TRUE)))  // fuer das Sommersemester entferne 5te und 4AFELC
+            if (((summer == FALSE) && (text[19] == '.'))   // fuer das erste Semester!
+                ||
+
+                ((summer == TRUE) &&                       // fuer das yweite Semester
+
+                (((text[3] == '1') && (text[10] ==  'J')) ||
+                 (text[3] == '2') ||
+                 (text[3] == '3') ||
+                 ((text[3] == '4') && (text[8] ==  'S')))) // fuer das Sommersemester entferne 5te und 4AFELC
+
+                )
             {
 
                 sprintf(t[i],"%c.%c%c%c%c%c%c| %s", text[18], text[20],text[21],text[22],text[23],text[24],text[25],text);
+
+
                 if (t[i][19] == 'E') // Embedded
                 {
                     t[i][19] = ' ';
@@ -2549,9 +2608,9 @@ int i, j, k, l;
 
 
 
-                while (text[i] != ';') i++; j = i; i++;
-                while (text[i] != ';') i++; k = i; i++;
-                while (text[i] != ';') i++; l = i;
+                while (text[i] != ';') {i++;} j = i; i++;
+                while (text[i] != ';') {i++;} k = i; i++;
+                while (text[i] != ';') {i++;} l = i;
 
                 textCutted[j] = '|';
                 textCutted[k] = '|';
