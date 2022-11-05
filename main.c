@@ -4,7 +4,7 @@
 //                                Σ i g m a
 //
 //
-//                                                               қuran jul 2022
+//                                                               қuran nov 2022
 //*****************************************************************************
 // history:
 // 2022.05 automatische Verzeichnisse für das Jahr und Monat erstellt
@@ -12,6 +12,8 @@
 // 2022.06 Embedded und Wireless muss noch in ein und selbe Klasse!
 // 2022.06 auch die 3AHELS braucht SigmaWerte / je nach sommer oder Winter!
 // 2022.06 erstelle Liste aller NG fuer die EL
+// 2022.11 segmentation fault - reason for: semicolom instead of comma in list!
+// 2022.11 die 5ten Klassen sollten auch in die sigma Liste aufgenommen werden!
 //*****************************************************************************
 // usage:
 // 1.)
@@ -25,7 +27,6 @@
 // 3.)  sind in der Liste , als Trenner verwendet / falls nein, aendern!!!
 //*****************************************************************************
 
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -33,9 +34,9 @@
 #include "console.h"
 
 
-#define LINEMAX             600
+#define LINEMAX             800
 #define LEN                 200
-#define SMAX                600
+#define SMAX                800
 #define TRUE                  1
 #define FALSE                 0
 
@@ -120,23 +121,20 @@ int getSubId(char * sub);
 
 void CutNames(char * fromFile, char * directory);
 
-
-
+//*****************************************************************************
+//                                 m a i n
+//*****************************************************************************
 int main(void)
 {
-FILE * liste, * listNoUnder, * tab, * fehl, * allTab, * notes, * percent, * sigmaList,
-     * protEL,    * protET,   * protIF,   * protMB,   * protWI, *sigma35, * check, * wel;
+FILE * liste, * listNoUnder, * tab, * fehl, * allTab, * notes, * percent,
+     * sigmaList, * protEL, * protET, * protIF, * protMB,
+     * protWI, *sigma35, * check, * wel;
 char text[LINEMAX];
 char FamNam[LINEMAX];
 char VorNam[LINEMAX];
 
-int i, j, k, l, n, m, r, s, w,lines, nSubs, gefunden, cId, sId, numberOfMembersWith5N, numberOfMembers;
-
-int f, h;
-// int contr;
-int anzS, anzN;
-//del? int semi, point;
-//del? char semiL, from, to;
+int i, j, k, l, n, m, r, s, w,lines, nSubs, f, h, anzS, anzN,
+    gefunden, cId, sId, numberOfMembersWith5N, numberOfMembers;
 
 char compClass[12];
 char qualifier[LINEMAX];
@@ -157,12 +155,8 @@ struct tm tm = *localtime(&ti);
 char dir[LEN];
 char answer[LEN];
 char command[LEN];
-//del? char fName[LEN];
-
 
 int summer; // if TRUE check die Jahresnote e.g. SS   else Semesternote e.g. WS
-
-
 
 
     /**┌───────────────────┐**/
@@ -175,7 +169,8 @@ int summer; // if TRUE check die Jahresnote e.g. SS   else Semesternote e.g. WS
     textcolor(BLACK);
 
     sprintf(dir,"%4d%02d", tm.tm_year + 1900, tm.tm_mon + 1);
-    printf("data stored in -> %s yes? or set a dir (6 digits)\n", dir);
+    printf("data stored in -> %s yes? or set a dir (e.g. 20106, 6 digits)\n", dir);
+    printf("note; month > 6 produces summer -  0 - 6  winter - explorations!\n");
     fflush(stdin);
     scanf("%s", answer);
 
@@ -189,9 +184,6 @@ int summer; // if TRUE check die Jahresnote e.g. SS   else Semesternote e.g. WS
         sprintf(dir,"%c%c%c%c%c%c", answer[0], answer[1], answer[2], answer[3], answer[4], answer[5]);
     }
 
-
-
-
     sprintf(command,"mkdir ./%c%c%c%c%c%c", dir[0], dir[1], dir[2], dir[3], dir[4], dir[5]);
     system(command);
 
@@ -202,20 +194,19 @@ int summer; // if TRUE check die Jahresnote e.g. SS   else Semesternote e.g. WS
     gotoxy(1,6); printf("--------------------------------------------------------------------------------");
     gotoxy(1,7);
 
-    if (dir[5] > '6')
+    if ((dir[5] > '6') || (dir[4] == '1'))
     {
         summer = TRUE;
-        printf("                                                             Jahresauswertung");
+        printf("- - - -  s o m m e r - e x p l o r a t i o n               Jahresauswertung");
     }
     else
     {
         summer = FALSE;
-        printf("                                                           Semesterauswertung");
+        printf("- - - -  w i n t e r - e x p l o r a t i o n               Semesterauswertung");
     }
 
 
-
-    t    = (char (*)[SMAX])malloc(SMAX * 20000);  // 20k lines
+    t    = (char (*)[SMAX])malloc(SMAX * 40000);  // 20k lines
     subs = (char (*)[30  ])malloc(SMAX * 200);    // 20k lines
     nSubs = 0;
 
@@ -237,7 +228,11 @@ int summer; // if TRUE check die Jahresnote e.g. SS   else Semesternote e.g. WS
     readF(&liste, "./Liste.csv");
     writeF(&listNoUnder, "./ListeNoUnder.csv");
 
+printf("a\n");
+
     delXUnderline(liste, listNoUnder); // sommer == TRUE: nur Jahresnoten und Sommersemester
+
+printf("k\n");
 
     fclose(liste);
     fclose(listNoUnder);
@@ -919,7 +914,11 @@ fclose(protWI);
                 (((text[3] == '1') && (text[10] ==  'J')) ||
                  (text[3] == '2') ||
                  (text[3] == '3') ||
-                 ((text[3] == '4') && (text[8] ==  'S')))) // fuer das Sommersemester entferne 5te und 4AFELC
+                 (text[3] == '4') ||
+                 (text[3] == '5')    ))
+
+               //((text[3] == '4') && (text[8] ==  'S')))) // fuer das Sommersemester entferne 5te und 4AFELC
+               // with the line above - absolventen are filtered out!
 
                 )
             {
@@ -1128,6 +1127,7 @@ char text[LINEMAX];
 int i, j, underLineFound;
 char newText[LINEMAX];
 
+int count = 0;
 
 
     do
@@ -1136,13 +1136,14 @@ char newText[LINEMAX];
         if (fgets(text, LINEMAX, l))
         {
 
-
+            for (i = 0; i < strlen(text); i++) if (text[i] == ';') text[i] = ',';
             i = 0;
-            while(text[i]!= ',') {newText[i] = text[i]; i++;} newText[i] = text[i]; i++;
-            while(text[i]!= ',') {newText[i] = text[i]; i++;} newText[i] = text[i]; i++;
-            while(text[i]!= ',') {newText[i] = text[i]; i++;} newText[i] = text[i]; i++;
-            while(text[i]!= ',') {newText[i] = text[i]; i++;} newText[i] = text[i]; i++;
-            while(text[i]!= ',') {newText[i] = text[i]; i++;} newText[i] = text[i]; i++;
+
+            while(text[i] != ',') {newText[i] = text[i]; i++;} newText[i] = text[i]; i++;
+            while(text[i] != ',') {newText[i] = text[i]; i++;} newText[i] = text[i]; i++;
+            while(text[i] != ',') {newText[i] = text[i]; i++;} newText[i] = text[i]; i++;
+            while(text[i] != ',') {newText[i] = text[i]; i++;} newText[i] = text[i]; i++;
+            while(text[i] != ',') {newText[i] = text[i]; i++;} newText[i] = text[i]; i++;
 
             // gibts hier ein Underline?:
 
@@ -1169,6 +1170,9 @@ char newText[LINEMAX];
             newText[i] = '\0';
 
             fprintf(l_no_unders,"%s",newText);
+
+count++;
+
         }
 
     } while (!feof(l));
