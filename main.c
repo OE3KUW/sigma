@@ -12,7 +12,7 @@
 // 2022.06 Embedded und Wireless muss noch in ein und selbe Klasse!
 // 2022.06 auch die 3AHELS braucht SigmaWerte / je nach sommer oder Winter!
 // 2022.06 erstelle Liste aller NG fuer die EL
-// 2022.11 segmentation fault - reason for: semicolom instead of comma in list!
+// 2022.11 alle ; werden durch , ersetzt, gilt für Liste.csv
 // 2022.11 die 5ten Klassen sollten auch in die sigma Liste aufgenommen werden!
 //*****************************************************************************
 // usage:
