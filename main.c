@@ -4,9 +4,10 @@
 //                                Σ i g m a
 //
 //
-//                                                               қuran nov 2022
+//                                                              қuran sept 2023
 //*****************************************************************************
 // history:
+// 2023.06 refactoring; mah Liste einbezogen
 // 2022.05 automatische Verzeichnisse für das Jahr und Monat erstellt
 // 2022.06 Abhaengig vom Monat Daten des Wintersemesters (123456) oder SS entw.
 // 2022.06 Embedded und Wireless muss noch in ein und selbe Klasse!
@@ -14,6 +15,11 @@
 // 2022.06 erstelle Liste aller NG fuer die EL
 // 2022.11 alle ; werden durch , ersetzt, gilt für Liste.csv
 // 2022.11 die 5ten Klassen sollten auch in die sigma Liste aufgenommen werden!
+// 2022.12 resort the sigma list. nr, names ...
+// 2023.02 Prognose für EL, und Begründungen schon ab > = 30.Prozent!
+// 2023.02 1AO -> 1OHIF; 1BO -> 1PHIF ukrainische Klassen der IF zugeordnet
+// 2023.02 sigmaList.txt ebenfalls ins Dir speichern
+// 2023.02 filtere alle 5er und N heraus: Step 6!
 //*****************************************************************************
 // usage:
 // 1.)
@@ -23,10 +29,14 @@
 //          Ausführen, das kann dauern - soll das Ergebnis angezeigt werden ja
 //          etwa 7 Minuten...
 // Exportieren als Liste.csv - ACHTUNG SEMIKOLOM
-// 2.)  define Jahresschluss richtigstellen, // SOMMERSEMMESTER_MIT_5xHELS_4FEL
+// 2.)  define Jahresschluss richtigstellen,
 // 3.)  sind in der Liste , als Trenner verwendet / falls nein, aendern!!!
+// sokrates > Auswertung > Standard > 152 > FW-Datum, FW-Lehrer, Gegenst, Art
 //*****************************************************************************
-
+// next steps:
+// erweitere Linux Version
+// verwende neue Stundentafeln
+//*****************************************************************************
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -41,60 +51,211 @@
 #define FALSE                 0
 
 #define SELTSAME_NOTEN_AUSGEBEN
-// #define SOMMERSEMMESTER_MIT_5xHELS_4FEL
 
-//                  0 1 2 3 4 5 6 7   8 9 0 1 2 3 4 5 6 7 8 9 0 1
-//                  1 1 2 2 3 3 4 4   1 1 2 2 3 3 4 4 4 4 5 5 5 5
-//                  F F F F F F F F   H H H H H H H H H H H H H H
-//                  S J W S W W W S   S J W S W S W S W S S J S J
-//                                                E E W W E E W W
-int weight[][22] = {
-/*AELT*/           {4,4,4,4,3,3,2,3,  0,0,0,0,0,0,0,0,0,0,0,0,0,0},
-/*AM  */           {2,2,2,2,2,2,0,0,  4,4,4,4,3,3,2,2,2,2,2,2,2,2},
-/*BESP*/           {2,2,2,2,2,2,1,1,  2,2,2,2,2,2,1,1,1,1,1,1,1,1},
-/*COIT*/           {0,0,0,0,2,2,2,2,  0,0,0,0,0,0,0,0,0,0,0,0,0,0},
-/*CTNT*/           {1,1,2,2,3,3,1,2,  0,0,0,0,0,0,0,0,0,0,0,0,0,0},
-/*D   */           {0,0,0,0,0,0,0,0,  3,3,2,2,2,2,2,2,2,2,2,2,2,2},
-/*DUK */           {3,3,3,3,2,2,2,2,  0,0,0,0,0,0,0,0,0,0,0,0,0,0},
-/*DIC1*/           {0,0,0,0,0,0,0,0,  0,0,1,1,2,2,2,2,2,2,3,3,2,2},
-/*E1  */           {2,2,2,2,2,2,0,0,  2,2,2,2,2,2,2,2,2,2,3,3,2,2},
-/*E2  */           {0,0,0,0,0,0,1,2,  0,0,0,0,0,0,2,2,2,2,0,0,0,0},
-/*ELDE*/           {2,2,2,2,2,2,1,2,  0,0,0,0,0,0,0,0,0,0,0,0,0,0},
-/*ELWP*/           {5,5,5,5,4,4,2,5,  0,0,0,0,0,0,0,0,0,0,0,0,0,0},
-/*FSST*/           {0,0,0,0,0,0,0,0,  3,3,3,3,3,3,4,4,2,2,5,5,2,2},
-/*GGP */           {2,2,1,1,0,0,0,0,  2,2,2,2,2,2,2,2,2,2,0,0,0,0},
-/*HWE1*/           {0,0,0,0,0,0,0,0,  6,6,5,5,3,3,4,4,4,4,7,7,7,7},
-/*KMEL*/           {0,0,2,2,3,3,1,2,  0,0,0,0,0,0,0,0,0,0,0,0,0,0},
-/*KSN1*/           {0,0,0,0,0,0,0,0,  0,0,0,0,2,2,2,2,3,3,2,2,4,4},
-/*LAB */           {0,0,0,0,3,3,2,4,  0,0,0,0,3,3,4,4,4,4,8,8,8,8},
-/*MTRS*/           {0,0,0,0,0,0,0,0,  0,0,2,2,2,2,2,2,3,3,2,2,4,4},
-/*NNWP*/           {4,4,4,4,8,8,2,4,  0,0,0,0,0,0,0,0,0,0,0,0,0,0},
-/*NW2 */           {0,0,0,0,0,0,0,0,  3,3,3,3,2,2,2,2,2,2,0,0,0,0},
-/*NWG */           {2,2,0,0,0,0,0,0,  0,0,0,0,0,0,0,0,0,0,0,0,0,0},
-/*PBE */           {0,0,0,0,0,0,0,0,  7,7,7,7,8,8,4,4,4,4,0,0,0,0},
-/*R   */           {2,2,2,2,2,2,1,2,  2,2,2,2,2,2,2,2,2,2,2,2,2,2},
-/*RK  */           {2,2,2,2,2,2,1,2,  2,2,2,2,2,2,2,2,2,2,2,2,2,2},
-/*REL */           {2,2,2,2,2,2,1,2,  2,2,2,2,2,2,2,2,2,2,2,2,2,2},
-/*ETH */           {2,2,2,2,2,2,1,2,  2,2,2,2,2,2,2,2,2,2,2,2,2,2},
-/*SOTE*/           {2,2,2,2,0,0,0,0,  0,0,0,0,0,0,0,0,0,0,0,0,0,0},
-/*UNF */           {0,0,2,2,2,2,1,1,  0,0,0,0,0,0,0,0,0,0,0,0,0,0},
-/*WIR3*/           {0,0,0,0,0,0,0,0,  0,0,0,0,0,0,3,3,3,3,2,2,2,2},
-/*SOPK*/           {1,1,1,1,0,0,0,0,  1,1,1,1,0,0,0,0,0,0,0,0,0,0},
-/*ORC5*/           {1,1,1,1,1,1,1,1,  1,1,1,1,1,1,1,1,1,1,1,1,1,1}
+//                  0 1 2 3 4 5 6 7   8 9 0 1 2 3 4 5 6 7 8 9 a b   c d e f g
+//                  1 1 2 2 3 3 4 4   1 1 2 2 3 3 4 4 4 4 5 5 5 5   1 2 3 4 5
+//                  F F F F F F F F   H H H H H H H H H H H H H H   H H H H H
+//                  S J W S W W W S   S J W S W S W S W S S J S J   S W W W S
+//                                                E E W W E E W W   b i o n i c s
+int weight[][27] = {
+/*AELT*/           {4,4,4,4,3,3,2,3,  0,0,0,0,0,0,0,0,0,0,0,0,0,0,  0,0,0,0,0},
+/*AM  */           {2,2,2,2,2,2,0,0,  4,4,4,4,3,3,2,2,2,2,2,2,2,2,  4,4,3,2,2},
+/*BESP*/           {2,2,2,2,2,2,1,1,  2,2,2,2,2,2,1,1,1,1,1,1,1,1,  2,2,2,1,1},
+/*COIT*/           {0,0,0,0,2,2,2,2,  0,0,0,0,0,0,0,0,0,0,0,0,0,0,  0,0,0,0,0},
+/*CTNT*/           {1,1,2,2,3,3,1,2,  0,0,0,0,0,0,0,0,0,0,0,0,0,0,  0,0,0,0,0},
+/*D   */           {0,0,0,0,0,0,0,0,  3,3,2,2,2,2,2,2,2,2,2,2,2,2,  3,2,2,2,2},
+/*DUK */           {3,3,3,3,2,2,2,2,  0,0,0,0,0,0,0,0,0,0,0,0,0,0,  0,0,0,0,0},
+/*DIC1*/           {0,0,0,0,0,0,0,0,  0,0,1,1,2,2,2,2,2,2,3,3,2,2,  0,1,2,2,3},
+/*E1  */           {2,2,2,2,2,2,0,0,  2,2,2,2,2,2,2,2,2,2,2,2,2,2,  2,2,2,2,2},
+/*E2  */           {0,0,0,0,0,0,1,2,  0,0,0,0,0,0,2,2,2,2,0,0,0,0,  0,0,1,1,1}, // jeweils 1 wertig - gleich in welchem Jahrgang
+/*ELDE*/           {2,2,2,2,2,2,1,2,  0,0,0,0,0,0,0,0,0,0,0,0,0,0,  0,0,0,0,0},
+/*ELWP*/           {5,5,5,5,4,4,2,5,  0,0,0,0,0,0,0,0,0,0,0,0,0,0,  0,0,0,0,0},
+/*FSST*/           {0,0,0,0,0,0,0,0,  3,3,3,3,3,3,4,4,2,2,5,5,2,2,  3,3,3,2,2},
+/*GGP */           {2,2,1,1,0,0,0,0,  2,2,2,2,2,2,2,2,2,2,0,0,0,0,  2,2,2,2,0},
+/*HWE1*/           {0,0,0,0,0,0,0,0,  6,6,5,5,3,3,4,4,4,4,7,7,7,7,  5,5,3,4,7}, // Projectnote zu HWE und Labor zugeschlagen
+/*KMEL*/           {0,0,2,2,3,3,1,2,  0,0,0,0,0,0,0,0,0,0,0,0,0,0,  0,0,0,0,0},
+/*KSN1*/           {0,0,0,0,0,0,0,0,  0,0,0,0,2,2,2,2,3,3,2,2,4,4,  0,0,2,2,2},
+/*LAB */           {0,0,0,0,3,3,2,4,  0,0,0,0,3,3,4,4,4,4,8,8,8,8,  0,0,3,4,8},
+/*MTRS*/           {0,0,0,0,0,0,0,0,  0,0,2,2,2,2,2,2,3,3,2,2,4,4,  0,2,2,2,3},
+/*NNWP*/           {4,4,4,4,8,8,2,4,  0,0,0,0,0,0,0,0,0,0,0,0,0,0,  0,0,0,0,0},
+/*NW2 */           {0,0,0,0,0,0,0,0,  3,3,3,3,2,2,2,2,2,2,0,0,0,0,  3,3,2,2,0},
+/*NWG */           {2,2,0,0,0,0,0,0,  0,0,0,0,0,0,0,0,0,0,0,0,0,0,  0,0,0,0,0},
+/*PBE */           {0,0,0,0,0,0,0,0,  7,7,7,7,8,8,4,4,4,4,0,0,0,0,  7,7,8,4,0},
+/*R   */           {2,2,2,2,2,2,1,2,  2,2,2,2,2,2,2,2,2,2,2,2,2,2,  2,2,2,2,2},
+/*RK  */           {2,2,2,2,2,2,1,2,  2,2,2,2,2,2,2,2,2,2,2,2,2,2,  2,2,2,2,2},
+/*REL */           {2,2,2,2,2,2,1,2,  2,2,2,2,2,2,2,2,2,2,2,2,2,2,  2,2,2,2,2},
+/*ETH */           {2,2,2,2,2,2,1,2,  2,2,2,2,2,2,2,2,2,2,2,2,2,2,  2,2,2,2,2},
+/*SOTE*/           {2,2,2,2,0,0,0,0,  0,0,0,0,0,0,0,0,0,0,0,0,0,0,  0,0,0,0,0},
+/*UNF */           {0,0,2,2,2,2,1,1,  0,0,0,0,0,0,0,0,0,0,0,0,0,0,  0,0,0,0,0},
+/*WIR3*/           {0,0,0,0,0,0,0,0,  0,0,0,0,0,0,3,3,3,3,2,2,2,2,  0,0,0,3,2},
+/*SOPK*/           {1,1,1,1,0,0,0,0,  1,1,1,1,0,0,0,0,0,0,0,0,0,0,  1,0,0,1,0},
+/*NEW */           {0,0,0,0,0,0,0,0,  0,0,0,0,0,0,0,0,0,0,0,0,0,0,  0,1,1,2,2}, // wireless
+/*NEW */           {0,0,0,0,0,0,0,0,  0,0,0,0,0,0,0,0,0,0,0,0,0,0,  0,1,1,2,2}, // bionics
+/*NEW */           {0,0,0,0,0,0,0,0,  0,0,0,0,0,0,0,0,0,0,0,0,0,0,  0,1,1,2,2}, // embedded
+/*FOEX*/           {1,1,1,1,1,1,1,1,  1,1,1,1,1,1,1,1,1,1,1,1,1,1,  1,1,1,1,1},
+/*ORC5*/           {1,1,1,1,1,1,1,1,  1,1,1,1,1,1,1,1,1,1,1,1,1,1,  1,1,1,1,1}  // bringt das eine Notenschnittsverbesserung ?
+};
+
+ char SubNames[][LINEMAX] =
+    {
+    "Englisch                                                                       ",
+    "Naturwissenschaftliche Grundlagen                                              ",
+    "Deutsch und Kommunikation                                                      ",
+    "Softwaretechnik                                                                ",
+    "Netzwerktechnik - Werkstätte und Produktionstechnik                            ",
+    "Angewandte Mathematik                                                          ",
+    "Computer- und Netzwerktechnik                                                  ",
+    "Angewandte Elektronik                                                          ",
+    "Geografie                                                                      ",
+    "Elektronik - Werkstätte und Produktionstechnik                                 ",
+    "Naturwissenschaften                                                            ",
+    "Elektronik Design                                                              ",
+    "Fachspezifische Softwaretechnik                                                ",
+    "Hardwareentwicklung                                                            ",
+    "Antriebstechnik und Mechatronik                                                ",
+    "Computerunterstützte Projektentwicklung                                        ",
+    "Angewandte Informatik                                                          ",
+    "Datenbanken und Informationssysteme                                            ",
+    "Programmieren und Software Engineering                                         ",
+    "Energiesysteme - Werkstätte und Produktionstechnik                             ",
+    "Energiesysteme                                                                 ",
+    "Bewegung und Sport                                                             ",
+    "Betriebswirtschaft und Management                                              ",
+    "Antriebstechnik und Mechatronik                                                ",
+    "Antriebstechnik und Mechatronik - Werkstätte und Produktionstechnik            ",
+    "Automatisierungstechnik                                                        ",
+    "Computergestützte Projektentwicklung                                           ",
+    "Fertigungstechnik 1                                                            ",
+    "Konstruktion und Projektmanagement                                             ",
+    "Elektrotechnik und Automatisierungstechnik                                     ",
+    "Fertigungstechnik 1 - Werkstätte und Produktionstechnik                        ",
+    "Betriebstechnik                                                                ",
+    "Produktionstechnologie und Werkstoffe                                          ",
+    "Informatik und Informationssysteme                                             ",
+    "Technische Mechanik und Berechnung                                             ",
+    "Werkstätte und Produktionstechnik                                              ",
+    "Elektrotechnik und Elektronik                                                  ",
+    "Maschinen und Anlagen                                                          ",
+    "Wirtschaft und Recht                                                           ",
+    "Prozessmanagement                                                              ",
+    "Laboratorium                                                                   ",
+    "Anlagen- und Prüftechnik                                                       ",
+    "Netzwerksysteme und Cyber Security                                             ",
+    "Netzwerksysteme und Verteilte Systeme                                          ",
+    "Webprogrammierung und Mobile Computing                                         ",
+    "Robotik und Prozessdatenverarbeitung                                           ",
+    "Systemplanung und Projektentwicklung                                           ",
+    "Produktmanagement                                                              ",
+    "Industrieelektronik                                                            ",
+    "Digitale Systeme und Computersysteme                                           ",
+    "Messtechnik und Regelungssysteme                                               ",
+    "Kommunikationssysteme und -netze                                               ",
+    "Maschinen- und Elektrotechnik                                                  ",
+    "Prototypenbau elektronischer Systeme                                           ",
+    "Fachspezifische Informationstechnik                                            ",
+    "Technische Mechanik und Berechnung                                             ",
+    "Mechanik und Maschinenelemente                                                 ",
+    "Fertigungstechnik 2                                                            ",
+    "Unternehmensführung                                                            ",
+    "Automatisierungstechnik und Industrieelektronik                                ",
+    "Automatisierungstechnik und Industrieelektronik - Werkstätte und Produktionstechnik ",
+    "Computer- und Informationstechnik                                              ",
+    "Werkzeugbau und Vorrichtungsbau                                                ",
+    "Kommunikationselektronik                                                       ",
+    "Computerarchitektur und Betriebssysteme                                        ",
+    "Unternehmensführung und Wirtschaftsrecht                                       ",
+    "Logistik                                                                       ",
+    "Konstruktion und Design                                                        "
+    };
+char SubN[][20] =
+{
+    "E                 ",
+    "NWG               ",
+    "DUK               ",
+    "SOTE              ",
+    "NWWP              ",
+    "AM                ",
+    "CTNT              ",
+    "AELT              ",
+    "GGP               ",
+    "ELWP              ",
+    "NW2               ",
+    "ELDE              ",
+    "FSST              ",
+    "HWE1              ",
+    "ANTMT             ",
+    "CPE               ",
+    "AINF              ",
+    "DBI               ",
+    "POS1              ",
+    "ES                ",    // ?? ES_3, ES_4
+    "ES1               ",
+    "BESP              ",
+    "BWM               ",
+    "ANTMT             ",
+    "ANTMTWP           ",
+    "AUT               ",
+    "CPE               ",
+    "FET1              ",
+    "KOP1              ",
+    "ETAT              ",
+    "FET1WP            ",     // ?? FET1WP_3, FET1WP_4
+    "BET               ",
+    "PROTWE            ",
+    "INFI              ",
+    "TMB               ",
+    "WPT               ",
+    "ETE               ",
+    "MANL              ",
+    "WIR               ",       // ??
+    "PRMN              ",
+    "LA1               ",
+    "APT1              ",
+    "NSCS              ",
+    "NVS1              ",
+    "WMC               ",
+    "ROBP              ",       // ??
+    "SYP1              ",
+    "PRMN              ",
+    "IE1               ",
+    "DIC1              ",
+    "MTRS              ",
+    "KSN1              ",
+    "MET1              ",
+    "PBE               ",
+    "FI                ",
+    "TMB               ",
+    "MME               ",
+    "FET               ",     // FET2 ????
+    "UNF               ",
+    "AUTI              ",
+    "ANTMTWP           ",
+    "COIT              ",
+    "WBVB              ",
+    "KMEL              ",
+    "CABS              ",
+    "UFW               ",
+    "LO1               ",      // LO ??
+    "KODES             "
 };
 
 
-
+    /**┌────────────────────────────────────────────────┐**/
+    /**                 global variables:                **/
+    /**└────────────────────────────────────────────────┘**/
+/*
 typedef struct weight WEIGHT;
 struct weight
 {
     char name[8]; // Gegenstandsbezeichnung
     int w;        // Wochenstundenzahl = Gewicht
 };
+*/
+
 
 int readF(FILE ** f, const char * s);
 int writeF(FILE ** f, const char * s);
-int delXUnderline(FILE * l, FILE * l_no_unders);
+int delXUnderline(FILE * l, FILE * l_no_unders, int summer);
 
 int copyFile(FILE * d, FILE * s);
 int sortTab(FILE * tS, FILE * t); // sortiert <--- tab
@@ -105,7 +266,7 @@ int tab2stat(FILE * tab, FILE * stat, FILE * prog);
 //int tab2sigma(FILE *tab, FILE * sigma, FILE * nps);
 int sortSigma(FILE * si, FILE * so, FILE * cl);
 int createNewYear(FILE * n, FILE * t);
-int getClassId(char * className, int SJ, int summer);
+int getClassId(char * className, int summer);
 
 int sort(char tab[][SMAX], int n);
 int delEQ(char tab[][SMAX], int n, int x);
@@ -120,6 +281,9 @@ int getClassIndex(char * classname); // ???
 int getSubId(char * sub);
 
 void CutNames(char * fromFile, char * directory);
+int procN[14] = {0}; // 0 == 1AFELC; 1 == 1AHELS; 2 == 1BHELS e.g.
+int gesN = 0, gesS = 0; // gesamt Zahl 5er einschließlich N, gesamt Zahl Schüler
+
 
 //*****************************************************************************
 //                                 m a i n
@@ -127,13 +291,21 @@ void CutNames(char * fromFile, char * directory);
 int main(void)
 {
 FILE * liste, * listNoUnder, * tab, * fehl, * allTab, * notes, * percent,
-     * sigmaList, * protEL, * protET, * protIF, * protMB,
-     * protWI, *sigma35, * check, * wel;
+     * sigmaList, * protEL, * protET, * protIF, * protMB, *mah,
+     * protWI, * check, * wel,
+     * procEL, * negList;
 char text[LINEMAX];
+char tnxt[LINEMAX];
 char FamNam[LINEMAX];
 char VorNam[LINEMAX];
+char Name[LINEMAX];
+char NextClass[LINEMAX];
+char Subject[LINEMAX];
+char Sub[LINEMAX];
+char Teacher[LINEMAX];
+char Date[LINEMAX];
 
-int i, j, k, l, n, m, r, s, w,lines, nSubs, f, h, anzS, anzN,
+int i, j, k, l, m, n, ok, r, s, w,lines, nSubs, f, h, anzN,
     gefunden, cId, sId, numberOfMembersWith5N, numberOfMembers;
 
 char compClass[12];
@@ -155,55 +327,104 @@ struct tm tm = *localtime(&ti);
 char dir[LEN];
 char answer[LEN];
 char command[LEN];
+char mahnClass[LEN];
+char mahnSub[LEN];
+char mahnSurName[LEN];
+char mahnName[LEN];
 
 int summer; // if TRUE check die Jahresnote e.g. SS   else Semesternote e.g. WS
 
 
-    /**┌───────────────────┐**/
-{   /**  I n i t s :        **/
+    /**┌────────────────────────────────────────────────┐**/
+{   /**  I n i t s :       Dir createted, summer = T/F   **/
+
+
+    initConsole();
+    clrscr();
 
     textcolor(RED);
     printf("-------------------------------------------------------------------------------\n");
-    printf("                                 Σ i g m a   %4d%02d\n", tm.tm_year + 1900, tm.tm_mon + 1);
+    printf("                                 s i g m a   2023                              \n");
     printf("-------------------------------------------------------------------------------\n");
-    textcolor(BLACK);
+    textcolor(WHITE);
 
-    sprintf(dir,"%4d%02d", tm.tm_year + 1900, tm.tm_mon + 1);
-    printf("data stored in -> %s yes? or set a dir (e.g. 20106, 6 digits)\n", dir);
-    printf("note; month > 6 produces summer -  0 - 6  winter - explorations!\n");
-    fflush(stdin);
-    scanf("%s", answer);
+    m = tm.tm_mon + 1;
 
-    if (((answer[0] >= '0') && (answer[0] <= '9')) &&
-        ((answer[1] >= '0') && (answer[1] <= '9')) &&
-        ((answer[2] >= '0') && (answer[2] <= '9')) &&
-        ((answer[3] >= '0') && (answer[3] <= '9')) &&
-        ((answer[4] >= '0') && (answer[4] <= '9')) &&
-        ((answer[5] >= '0') && (answer[5] <= '9'))    )
+    // im Juni  bis zum Nov möchte ich eine Jahresauswertung, alle anderen Monate nur das Semester
+
+
+    sprintf(dir,"%c%4d", ((m > 5) && (m < 12)) ? 'J' : 'S', tm.tm_year + 1900);
+    printf("data stored in -> %s yes? or set a dir (e.g. J2010)\n", dir);
+    printf("from december to may -> Semester, from june to november -> Jahresauswertung\n");
+
+    ok = 0;
+    do
     {
-        sprintf(dir,"%c%c%c%c%c%c", answer[0], answer[1], answer[2], answer[3], answer[4], answer[5]);
-    }
+        printf("%s yes? ", dir);
+        fflush(stdin);
+        scanf("%s", answer);
 
-    sprintf(command,"mkdir ./%c%c%c%c%c%c", dir[0], dir[1], dir[2], dir[3], dir[4], dir[5]);
+        if (answer[0] == 'y') ok = 1;
+
+        if (((answer[0] == 'J') || (answer[0] == 'S')) &&
+            ((answer[1] >= '0') && (answer[1] <= '9')) &&
+            ((answer[2] >= '0') && (answer[2] <= '9')) &&
+            ((answer[3] >= '0') && (answer[3] <= '9')) &&
+            ((answer[4] >= '0') && (answer[4] <= '9'))    )
+       {
+              answer[5] = '\0';
+              sprintf(dir,"%s", answer);
+              ok = 1;
+       }
+
+    } while (!ok);
+
+
+    printf("\n----> dir: %s will be created! If it exists: delete it first!", dir);
+
+
+
+#ifdef __linux__
+    sprintf(command,"mkdir ./%c%c%c%c%c%c", dir[0], dir[1], dir[2], dir[3], dir[4]);
+#else
+    sprintf(command,"mkdir   %c%c%c%c%c%c", dir[0], dir[1], dir[2], dir[3], dir[4]);
+#endif
+
+    printf("\n%s\n", command);
     system(command);
 
-    sprintf(command,"cp ./Liste.csv ./%c%c%c%c%c%c/Liste.csv", dir[0], dir[1], dir[2], dir[3], dir[4], dir[5]);
+#ifdef __linux__
+    sprintf(command,"cp   ./Liste.csv       ./%c%c%c%c%c%c/Liste.csv", dir[0], dir[1], dir[2], dir[3], dir[4]);
+#else
+    sprintf(command,"copy \"Liste.csv\"   \"./%c%c%c%c%c/Liste.csv\"", dir[0], dir[1], dir[2], dir[3], dir[4]);
+
+#endif
+
+    printf("\n%s\n", command);
     system(command);
 
-    gotoxy(1,5); printf("Liste.csv is stored in %s                                                       ", dir);
-    gotoxy(1,6); printf("--------------------------------------------------------------------------------");
-    gotoxy(1,7);
+getch();
 
-    if ((dir[5] > '6') || (dir[4] == '1'))
+    clrscr();
+
+    gotoxy(0,0); printf("--------------------------------------------------------------------------------");
+    gotoxy(0,1); printf("Liste.csv is stored in %s", dir);
+    gotoxy(0,2); printf("--------------------------------------------------------------------------------");
+    gotoxy(0,3);
+
+
+    if (dir[0] == 'J')
     {
         summer = TRUE;
-        printf("- - - -  s o m m e r - e x p l o r a t i o n               Jahresauswertung");
+        printf("Jahresauswertung");
     }
     else
     {
         summer = FALSE;
-        printf("- - - -  w i n t e r - e x p l o r a t i o n               Semesterauswertung");
+        printf("Semesterauswertung");
     }
+
+
 
 
     t    = (char (*)[SMAX])malloc(SMAX * 40000);  // 20k lines
@@ -215,27 +436,29 @@ int summer; // if TRUE check die Jahresnote e.g. SS   else Semesternote e.g. WS
 
     if (!t) {printf("\nzu wenig Speicher!\n"); exit(-1);}   // in t wird später das ganze File allTabs eingelesen
 
-    gotoxy(1,8); printf("Initialisierungen abgeschlossen .... \n");
+    gotoxy(0, 6); printf("Initialisierungen abgeschlossen ...... weiter?\n");
+    getch();
+
+
 
 }
-    /**└───────────────────┘**/
+    /**└────────────────────────────────────────────────┘**/
 
-    /**┌───────────────────┐**/
-{   /**          1          **/
+    /**┌────────────────────────────────────────────────┐**/
+{   /**          1                                       **/
 
     printf("Schritt 1: aus Liste.csv werden alle Underlines entfernt!\n");
 
     readF(&liste, "./Liste.csv");
     writeF(&listNoUnder, "./ListeNoUnder.csv");
 
-printf("a\n");
+    delXUnderline(liste, listNoUnder, summer);
 
-    delXUnderline(liste, listNoUnder); // sommer == TRUE: nur Jahresnoten und Sommersemester
-
-printf("k\n");
+    // hier wurde die 1AO mit 1OHIF, die 1BO mit der 1OHELS ersetzt !
 
     fclose(liste);
     fclose(listNoUnder);
+
     writeF(&liste, "./Liste.csv");
     readF(&listNoUnder, "./ListeNoUnder.csv");
 
@@ -243,16 +466,15 @@ printf("k\n");
     fclose(liste);
     fclose(listNoUnder);
 
-
-
 }
-    /**└───────────────────┘**/
+    /**└────────────────────────────────────────────────┘**/
 
-    /**┌───────────────────┐**/
-{   /**          2          **/
+    /**┌────────────────────────────────────────────────┐**/
+{   /**          2                                       **/
 
 
     printf("Schritt 2: Liste.csv -> Tab.csv pro Schueler eine Zeile!\n");
+
 
     readF(&liste, "./Liste.csv");
     writeF(&tab, "./Tab.csv");
@@ -295,62 +517,53 @@ printf("k\n");
     fclose(tab);
 
 }
-    /**└───────────────────┘**/
-
-
-
+    /**└────────────────────────────────────────────────┘**/
 
     /**┌────────────────────────────────────────────────┐**/
 {   /**          3          Protokolle werden erstellt   **/
 
-// an dieser Stelle wissen wir bereits, ob es sich um Ganzjahresnoten oder nur um Semesteryeugnisse handelt.
-// wurde auch nur eine Klasse 1xHxxx_J gefunden sind es Ganyjahresnoten!
-// es werden dann zwei Sigma Listen erstellt, ansonsten nur eine.
-
-
-
-
-// Ziel: 1) finde jene Gegenstände, die mehr als ein drittel 5er haben Kennzeichne ? und mehr als die Hälfte !
-//       2) finde die Klassenbezeichnung zumindest in der 4AFEL W oder S heraus!
-
-    printf("Schritt 3: Tab.csv -> allAbtTabNotes.csv  Abtbez.  Schuelername , Gegenstaende sortiert!\n");
-    printf("Protokoll Unterlagen werden erstellt\n");
+    printf("Schritt 3: Tab.csv -> Protokoll Unterlagen fuer alle Abt generiert\n");
 
     i = 0;
-    anzS = anzN = 0; // Anzahl Schueler der EL und Anźahl der Nicht genuegend (bzw Nichtbeurtielt) der EL
+    anzN = 0; // Anzahl Schueler der EL und Anźahl der Nicht genuegend (bzw Nichtbeurtielt) der EL
 
     readF(&tab, "./Tab.csv");
     writeF(&allTab, "./allAbtTab.csv");
     writeF(&notes, "./allAbtTabNotes.csv");
     writeF(&percent, "./Prozent5erProGegenstand.csv");
 
+    writeF(&protEL,"./Protokoll_Unterlagen_EL.csv");
+    writeF(&protET,"./Protokoll_Unterlagen_ET.csv");
+    writeF(&protIF,"./Protokoll_Unterlagen_IF.csv");
+    writeF(&protMB,"./Protokoll_Unterlagen_MB.csv");
+    writeF(&protWI,"./Protokoll_Unterlagen_WI.csv");
 
-    writeF(&protEL,"./Prtokoll_Unterlagen_EL.csv");
-    writeF(&protET,"./Prtokoll_Unterlagen_ET.csv");
-    writeF(&protIF,"./Prtokoll_Unterlagen_IF.csv");
-    writeF(&protMB,"./Prtokoll_Unterlagen_MB.csv");
-    writeF(&protWI,"./Prtokoll_Unterlagen_WI.csv");
+    writeF(&wel,"./Wiederholungspruefungen.csv");  fprintf(wel,"%s\n",dir); // für alle Abteilungen!
 
-    writeF(&wel,"./Wiederholungspruefungen_EL.csv");
-
-    fprintf(wel,"2022 Juni \n");
-
+/*
+J2023
+EL;5;05;1AHELS_J  ;GGP;Jukic;Marko;
+EL;5;05;1AHELS_J  ;HWE1;Jukic;Marko;
+EL;5;03;1AHELS_J  ;AM;Otter;Oliver;
+EL;5;03;1AHELS_J  ;FSST;Otter;Oliver;
+EL;5;03;1AHELS_J  ;HWE1;Otter;Oliver;
+EL;5;01;1AHELS_J  ;HWE1;Pek;Muhammed Huzeyfe;
+EL;5;01;1AHELS_J  ;AM;Pinz;Martin;
+EL;5;01;1AHELS_J  ;HWE1;Relota;Nicola;
+EL;N;06;1AHELS_J  ;AM;Seidl;Alex;
+*/
 
     do   // Tab wird in tab eigelesen ... Gleichzeitig werden hier Vorgezogene Prüfungen entfernt
     {
         fgets(text, LINEMAX, tab);
 
-
-        if ((text[0] >= '0') && (text[0] <= '8') &&                      // nur Klassen zwischen dem 1 und 5 Jahrgang bis 8 Abendschule!
-            ((text[2] == 'H') || (text[2] == 'F') || (text[2] == 'B')))  // nur Höhere oder Fachschule oder Abendschule
-            // - keine V ... Vorgeyogene Matura!
+        if ((text[0] >= '0') && (text[0] <= '8') &&                      // nur Klassen zwischen dem 1 und 8 Jahrgang (Abendschule)!
+            ((text[2] == 'H') || (text[2] == 'F') || (text[2] == 'B')))  // nur Höhere oder Fachschule oder Abendschule - keine V (=Vorgezogene)
         {
             sprintf(t[i],"%s", text);
             fprintf(allTab, "%s",text);  // wer braucht diese Liste noch???
             i++;
         }
-
-
     } while (!feof(tab));
 
     sprintf(t[i],"5AXXX\n"); // Endekennung ...   für die weitere Bearbeitung wird eine letzte Zeile eingefügt
@@ -361,18 +574,11 @@ printf("k\n");
     lines = i;
 
 
-
-
-
-
-
-
     // nun wird Klasse für Klasse als Block bearbeitet.
 
     j = 0;
 
     sprintf(compClass,"%c%c%c%c%c%c%c%c%c%c", t[j][0], t[j][1], t[j][2], t[j][3], t[j][4], t[j][5], t[j][6], t[j][7], t[j][8], t[j][9] );
-
 
     for (i = 0; i < lines; i++)    // für alle Einträge
     {
@@ -381,7 +587,8 @@ printf("k\n");
             (compClass[2] != t[i][2]) ||           // H
             (compClass[3] != t[i][3]) ||           // E
             (compClass[4] != t[i][4]) ||           // L
-            (compClass[5] != t[i][5])            // S
+            (compClass[5] != t[i][5])              // S .. an 6ter Stelle wäre E oder W, dies wird hier nicht als andere KLasse verstanden!
+                                                   // neu hinzukommen wird B ! für bionics
 //            (compClass[6] != t[i][6]) ||           // E Embedded W Wireless
 //            (compClass[7] != t[i][7]) ||  // 4AHELSE oder 4AHELSW soll sich nicht unterscheiden
 //            (compClass[8] != t[i][8]) ||
@@ -401,7 +608,12 @@ printf("k\n");
          *
          **/
 
-            cId = getClassId(compClass, t[j][11], summer);
+
+            cId = getClassId(compClass, summer);  // diese Id ist wichtig für die Gewichtung der Noten
+            // compClass zb 1AHELS
+            // t[j][11] hier steht J für Ganzjahr oder S für Semester....
+            // summer enthält die gleiche Info!
+
 
 //if (cId < 0) printf("class: ---> %s found!\n",compClass);  ///  for tests only
 
@@ -413,7 +625,6 @@ printf("k\n");
             // Arrays mit lauter Null-Einträgen wird vorbereitet:
 
             for (k = 0; k < nSubs; k++) subs5Anz[k] = subs5Prozent[k] = subsNAnz[k] = 0;
-
 
             numberOfMembersWith5N = 0;
             numberOfMembers = i;
@@ -432,7 +643,6 @@ printf("k\n");
                 fprintf(notes,"%c%c,", t[j][3], t[j][4]); // Abteilungszugehörigkeit  - in das File AllTabsNotes
                 sprintf(Abt,"%c%c;", t[j][3], t[j][4]);   // Abteilungszugehörigkeit
 //Abt
-
 
             // 4AHELSW
                 while(t[j][r] != ',') {fprintf(notes,"%c", t[j][r]); ClassName[r] = t[j][r]; r++;}
@@ -509,6 +719,8 @@ printf("k\n");
 //################################################################
 
 
+
+
                 gefunden = 0;
                 r = 0;
 // qualifier enthält alle Gegenstände und alle Noten in einer Zeile - dient zum Suchen der Note
@@ -525,6 +737,14 @@ printf("k\n");
 
                         if (cId) sId = getSubId(subs[k]);  // liefert die Zeilennummer der Gewichtstabelle
 
+
+//#######
+//#######  hier wird ab 2023/2024 eine neue Stundentafel verwendet werden.
+//#######
+//#######
+//#######
+
+
 // Control: if ( contr)
 //{
 //printf("| sub %s %c %d ", subs[k], qualifier[ + r + strlen(subs[k]) + 1], weight[sId][cId] );
@@ -534,22 +754,22 @@ printf("k\n");
                         fprintf(notes, "%c,", qualifier[ + r + strlen(subs[k]) + 1] );
 
 // falls 5er rausschreiben
-//### Baustelle!!!
-//### Baustelle!!!
-//### Baustelle!!!
-//### Baustelle!!!
-//### Baustelle!!!
-//### Baustelle!!!
 
-                if ((nFlecks > 0) && (nFlecks < 3) && (Abt[1] == 'L') &&
+                if (/*(nFlecks > 0) && (nFlecks < 3) && (Abt[1] == 'L') && */
                     (((qualifier[ + r + strlen(subs[k]) + 1]) == '5') ||
                      ((qualifier[ + r + strlen(subs[k]) + 1]) == 'N')     )
                     )
                 {
-                    fprintf(wel,"%s;%s;%s;%s;\n", ClassName, FamNam, VorNam, subs[k]);
+                    fprintf(wel,"%c%c,%c,%02d,%s,ddmmjj,00,0000,%s,%s,%s,\n",
+                            ClassName[3],ClassName[4],
+                            qualifier[ + r + strlen(subs[k]) + 1], nFlecks, ClassName, subs[k], FamNam, VorNam); // für EL werden hier die Wiederholungsprüfungskandidaten gesammelt
                 }
-
-
+/*
+J2023
+EL;5;08;1AFELC_J  ;jjmmdd;00;A;TTTT;AELT;Aibartuev;Musa;
+EL;5;08;1AFELC_J  ;jjmmdd;00;A;TTTT;AM;Aibartuev;Musa;
+Anzahl der 5er, Monat Tag Jahr der letzten Mahnung,  Lehrer...
+*/
 
                         if ((cId >= 0) && (sId >= 0))
                         {
@@ -563,6 +783,8 @@ printf("k\n");
                             if (m == 'G') m = 0; // Gestundet
                             if (m == 'Z') m = 0; // zufriedenstellend
                             if (m == 'W') m = 0; // wenig zufriedenstellend
+                            if (m == 'X') m = 0; // keine Konfession: REL X -> wird wie S behandelt!!!
+                            if (m == '8') {m = 5; printf("§");}// ????? unbekannte Note  in einem ETH Gegenstand
 
                             if ((m > 0) && (m <= 5))
                             {
@@ -635,6 +857,9 @@ printf("k\n");
         j = i;
         sprintf(compClass,"%c%c%c%c%c%c%c%c%c%c", t[i][0], t[i][1], t[i][2], t[i][3], t[i][4],t[i][5], t[i][6], t[i][7], t[i][8], t[i][9]);
 
+
+
+
 // Percent5er pro Gegenstand:
 
 //fprintf(percent,"%c%c,", t[j][3], t[j][4]); // Abteilungszugehörigkeit
@@ -676,7 +901,7 @@ fprintf(percent,"%s;%d;%d; %d,%03d\n", subs[k], subs5Anz[k], subsNAnz[k], (subs5
         fprintf(notes,"\n");
 
 
-            fprintf(notes,"%c%c,%s,  ,         , in Prozent  ab 30 %% -> Begruendung!  ,,,", Abt[0], Abt[1], ClassName);
+        fprintf(notes,"%c%c,%s,  ,         , in Prozent  ab 30 %% -> Begruendung!  ,,,", Abt[0], Abt[1], ClassName);
 
         for (k = 0; k < nSubs; k++) subsNAnzListe[k] = 0;
 
@@ -685,7 +910,8 @@ fprintf(percent,"%s;%d;%d; %d,%03d\n", subs[k], subs5Anz[k], subsNAnz[k], (subs5
             l = 0;
             while (l < strlen(subs[k]) - 1) {fprintf(notes," "); l++;}
             fprintf(notes,",%2d,", (subsNAnz[k] == 0)? 0:(int)((subs5Anz[k] * 100.) / subsNAnz[k]));
-            if ((int)((subs5Anz[k] * 100.) / subsNAnz[k])  > 30)
+
+            if ((int)((subs5Anz[k] * 100.) / subsNAnz[k])  >= 30.)
             {
                 subsNAnzListe[k] = (int)((subs5Anz[k] * 100.) / subsNAnz[k]);
             }
@@ -725,6 +951,7 @@ fclose(notes);
 fclose(percent);
 
 // -------- #
+
 
 
 // fuer die einzelnen Abteilungen Filtern:
@@ -799,6 +1026,7 @@ fclose(protWI);
 // alle hinten angefügten sigma WSerte müssen jetzt noch nach vo übertragen werden.
 
 
+
     readF(&allTab, "./allAbtTabNotes.csv");
     writeF(&notes, "./allAbtNotesWithSigma.csv");
 
@@ -843,6 +1071,7 @@ fclose(protWI);
 
 
 
+
 // gesamtZeilenzahl merken
 // i = j = 0; Vergleichsname der ersten Zeile verwenden
 
@@ -855,11 +1084,11 @@ fclose(protWI);
 
 
 
-    CutNames("./Prtokoll_Unterlagen_EL.csv", dir);   CutNames("./Prtokoll_Unterlagen_ET.csv", dir);
-    CutNames("./Prtokoll_Unterlagen_IF.csv", dir);
-    CutNames("./Prtokoll_Unterlagen_MB.csv", dir);
-    CutNames("./Prtokoll_Unterlagen_WI.csv", dir);
-
+ //   CutNames("./Protokoll_Unterlagen_EL.csv", dir);   ... nicht mehr nötig - andere Lösung: speichere ins Teams.
+ //   CutNames("./Protokoll_Unterlagen_ET.csv", dir);
+ //   CutNames("./Protokoll_Unterlagen_IF.csv", dir);
+ //   CutNames("./Protokoll_Unterlagen_MB.csv", dir);
+ //   CutNames("./Protokoll_Unterlagen_WI.csv", dir);
 
 
 
@@ -875,14 +1104,14 @@ fclose(protWI);
     // sie werden nach sigma sortiert.
 
 
-    printf("Schritt 4: Sortiere fuer EL alle sigma-Wertungen. Erstelle Bestenliste! => sigmaList.csv\n");
+    printf("Schritt 4: Sortiere fuer EL alle sigma-Wertungen! => sigmaList.csv\n");
 
 
 
     i = 0;
 
     readF(&tab, "./allAbtNotesWithSigma.csv");
-    writeF(&sigmaList, "./sigmaList.csv");
+    writeF(&sigmaList, "./sigmaNames.csv");
 
     writeF(&check, "./check.txt");
 
@@ -961,8 +1190,7 @@ fclose(protWI);
 
     fclose(check);
 
-
-    anzS = i;
+    // i stores ne number of pubil
 
 
     // erkenne gleich gute Schüler und ergänze einen Reihungswert
@@ -1011,61 +1239,237 @@ fclose(protWI);
     fclose(sigmaList);
     fclose(tab);
 
+    // resort sigma list:
+
+    readF(&tab, "./sigmaNames.csv");
+    writeF(&sigmaList, "./sigmaList.csv");
+
+
+
+
+// zuerst in tab lesen
+// ########
+// dabei aber auch umsortieren - zuallererst kommt der sigma Wert --- fals EL Sommersemester!
+
+    do   // Tab wird in tab eigelesen ... Gleichzeitig werden hier Vorgezogene Prüfungen entfernt
+    {
+        if (fgets(text, LINEMAX, tab) != 0)
+        {
+            i = 28;
+            j = 0;
+            l = 0;
+            while (text[i] != '\0') {Name[j] = text[i]; i++; j++; l++;}
+            Name[l - 1] = ',';
+            Name[l] = '\0';
+            sprintf(tnxt, "%c%c%c%c%s%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c", text[0], text[1], text[2], text[3], Name,
+            text[4], text[5], text[6], text[7], text[8], text[9], text[10], text[11], text[12], text[13], text[14], // Klasse
+            text[18], text[19], text[20],text[21], text[22], text[23], text[24], text[25], text[26]
+              );
+            tnxt[l + 4 + 11 + 9] = '\0';
+
+            fprintf(sigmaList,"%s\n",tnxt);
+        }
+    }   while (!feof(tab));
+
+    fclose(sigmaList);
+    fclose(tab);
+
+
+    sprintf(command,"cp ./sigmaList.csv ./%c%c%c%c%c%c/sigmaList.csv", dir[0], dir[1], dir[2], dir[3], dir[4], dir[5]);
+    system(command);
 
 }
     /**└────────────────────────────────────────────────┘**/
 
-    /**┌───────────────────┐**/
-{   /**          5         **/
-
-
-///####
-
-exit(0);
-
-    // hier werden alle Daten für den MailGenerator erstellt
-    // Ziel:
-    // aus allAbtNotesWithSigma.csv soll mailGeneratorList.txt erstellt werden:
-    // alle Schüler der ersten Klassen, die mehr als 2 NichtGenügend haben. + Genaue Liste der Gegenstände mit Nichtgenpgend.
-    // zB:
-    // ,1AFELC, Zuser, Christian, NWG, AM,BESP
-
-    // später wird hier die Mailadresse eingefügt.
-
-    printf("Schritt 5: finde Schüler die Absturzgefaehrdet sind -> threeNGlist\n");
+    /**┌────────────────────────────────────────────────┐**/
+{   /**          5          Mahnungen eingetragen        **/
 
 
 
-    readF(&tab, "./allAbtNotesWithSigma.csv");
-    writeF(&sigma35, "./threeNGlist.csv");
+    printf("Schritt 5: Oeffne Mah.txt und trage in Wiederholungsp. ein\n");
+    getch();
+    system("cls");
+
+
+    readF(&wel, "./Wiederholungspruefungen.csv");
+    readF(&mah, "./Mah.csv");
+
+
+
+
+/*
+Klasse,Familienname,Vorname,Geburtsdatum,Gegenstand,FW-Datum,LehrerIn,FW-Art,FW-Anmerkung,,,,
+1ABMB,Guthan,Florian,06.09.1998,Englisch,04.05.2023,Vrana Philip,Mahnung,,,,,
+1AFELC,Aibartuev,Musa,26.08.2008,Naturwissenschaftliche Grundlagen,11.11.2022,Szabo Simona,Mahnung,,,,,
+1AFELC,Aibartuev,Musa,26.08.2008,Englisch,02.04.2023,Waidmayr Margit,Mahnung,,,,,
+*/
+    // wel in t einlesen.
+
+    //erste Zeile nicht...
+    fgets(text, LINEMAX, wel);
+
+    i = 0;
 
     do   // Tab wird in tab eigelesen ... Gleichzeitig werden hier Vorgezogene Prüfungen entfernt
     {
-        fgets(text, LINEMAX, allTab);
+        fgets(text, LINEMAX, wel);
+        sprintf(t[i],"%s", text);
+        i++;
+    } while (!feof(wel));
+
+    fclose(wel);
+
+    // sortieren ... zur Kontrolle...
+
+    sort(t,i);
+
+    // Zeile für Zeile aus Mah lesen und in t eintragen
+
+    fgets(text, LINEMAX, mah);
+//    printf("erste Zeile --->%s", text);
+
+    f = 0;
+
+    while ((!feof(mah)) /*&& (f < 800)*/)  // zuerst nur die ersten paar Zeilen...
+    {
+        fgets(text, LINEMAX, mah);
+//        system("cls");
+//        printf("%3d %s\n", f, text);
+
+        f++;
+        j = k = 0;  while (text[j] != ',') { ClassName[k] = text[j]; j++; k++; } ClassName[k] = '\0';
+
+//        printf("a) ClassName: .%s.\n", ClassName);
+
+        j++; k = 0; while (text[j] != ',') { FamNam[k] = text[j];    j++; k++; } FamNam[k] = '\0';
+        j++; k = 0; while (text[j] != ',') { VorNam[k] = text[j];    j++; k++; } VorNam[k] = '\0';
+
+//        printf("b) Name: .%s.  .%s.\n", FamNam, VorNam);
+
+        j++;        while (text[j] != ',') {j++;} // Geb Datum wird übersprungen
+
+        // Gegenstand einlesen und Kurzform finden.
+        //######
+        sprintf(Subject, "                                                                                                    ");
+
+        j++; k = 0; while ((text[j] != ',') && ((strcmp("Geografie", Subject) != 0))) { Subject[k] = text[j]; j++; k++; } Subject[k] = '\0';
+
+        if (strncmp("Geografie", Subject, 9) == 0)  // weil GGP ein Gegenstand ist, in dem im Namen ein Beistich vorkommt!!!
+        {
+            j++; while (text[j] != ',') {j++;}
+        }
+
+//        printf("k = %d \n", k);
+//        printf("c) sub: %s\n", Subject);
+
+
+
+        j++; k = 0; while (text[j] != ',') { Date[k] = text[j];      j++; k++; } Date[k] = '\0';
+
+//        printf("d) Datum: !%s!\n", Date);
+
+        j++; k = 0; while (text[j] != ',') { Teacher[k] = text[j];   j++; k++; } Teacher[k] = '\0';
+//        printf("e) teacher: .%s.\n", Teacher);
 
         n = 0;
-        if (text[14] != ' ') n  = (text[14] - '0') * 10;
-        if (text[15] != ' ') n += (text[15] - '0');
 
-        if ((n >= 3) && (text[3] == '1'))
+//        printf("Subject: %s\n", Subject);
+
+
+        for (k = 0; k < sizeof(SubNames)/LINEMAX;k++)
         {
-            fprintf(sigma35,"%s", text);
+            l = strlen(Subject);
+            if (strncmp(Subject, SubNames[k], l) == 0)
+            {
+                sprintf(Sub,"%s",SubN[k]);
+//                printf("f) SubN .%s.\n", SubN[k]);
+                k = sizeof(SubNames)/LINEMAX;
+                n = 1;
+            }
+        }
+        if (n != 1)
+        {
+            printf("\nSubject not found: %s\n", Subject);
+        }
+
+        r = 0; while ((Sub[r] != ' ') && (Sub[r] != '\0')) { r++; } Sub[r] = '\0';
+
+        // printf("---- read in tab --- \n");
+
+
+        for (m = 0; m < i; m++)
+        {
+
+            s = 0; while (t[m][s] != ',') { s++; } s++;
+                   while (t[m][s] != ',') { s++; } s++;
+                   while (t[m][s] != ',') { s++; } s++;
+            r = 0; while (t[m][s] != ',') { mahnClass[r]   = t[m][s]; s++; r++; } s++; mahnClass[r]   = '\0';
+            r = 0; while ((mahnClass[r] != '_') && (mahnClass[r] != '\0')) { r++; }    mahnClass[r]   = '\0';
+                                                                              // eleminate _J in 1AFELC_J
+                   while (t[m][s] != ',') { s++; } s++;
+                   while (t[m][s] != ',') { s++; } s++;
+                   while (t[m][s] != ',') { s++; } s++;
+            r = 0; while (t[m][s] != ',') { mahnSub  [r]   = t[m][s]; s++; r++; } s++; mahnSub[r]     = '\0';
+            r = 0; while ((mahnSub[r] != ' ') && (mahnSub[r] != '\0')) { r++; }        mahnSub[r]     = '\0';
+            r = 0; while (t[m][s] != ',') { mahnSurName[r] = t[m][s]; s++; r++; } s++; mahnSurName[r] = '\0';
+            r = 0; while (t[m][s] != ',') { mahnName[r]    = t[m][s]; s++; r++; } s++; mahnName[r]    = '\0';
+
+
+            // for tests: if (m <= 10) printf("T:: %02d: .%s. Subject .%s. Name:.%s. name .%s.\n", m, mahnClass, mahnSub, mahnSurName, mahnName);
+
+            if (((strncmp(mahnSurName,FamNam,strlen(FamNam))) == 0) &&
+                ((strncmp(mahnName,VorNam,strlen(VorNam))) == 0) &&
+                ((strncmp(mahnSub,Sub,strlen(Sub))) == 0)     )
+            {
+//                printf("== %d: class: .%s. name: .%s. .%s.  subj: .%s. date: %s\n",m, mahnClass, mahnSurName,  mahnName, Sub, Date);
+
+                t[m][19] = Date[0];
+                t[m][20] = Date[1];
+                t[m][21] = Date[3];
+                t[m][22] = Date[4];
+                t[m][23] = Date[8];
+                t[m][24] = Date[9];
+                t[m][32]++;
+//                printf("m: %d %s", m, t[m]);
+printf("*"); // gefunden
+
+            }
+
         }
 
 
-    }   while (!feof(tab));
+//printf("hier!\n");
+//        getch();
+    }
 
 
-    fclose(tab);
-    fclose(sigma35);
+
+
+
+
+
+
+
+
+    //  mah schließen
+
+    fclose(mah);
+
+
+
+
+
+
+    // Wiederholungsprüfungen sortieren und wieder speichern
+
+    writeF(&wel,"./Wiederholungspruefungen.csv");
+
+
+    for (j = 0; j < i; j++) fprintf(wel,"%s", t[j]);
+
+    fclose(wel);
 }
-    /**└───────────────────┘**/
-
-    /**┌───────────────────┐**/
-{   /**          5         **/
-    printf("Schritt 6: EL Anzahl der NichtGenuegend %d  pro Kopf %0.3f\n", anzN, (float)(anzN)/anzS);
-}
-    /**└───────────────────┘**/
+    /**└────────────────────────────────────────────────┘**/
 
 
 
@@ -1120,14 +1524,12 @@ char text[LINEMAX];
 }
 
 //*****************************************************************************
-int delXUnderline(FILE * l, FILE * l_no_unders)
+int delXUnderline(FILE * l, FILE * l_no_unders, int summer)
 //*****************************************************************************
 {
 char text[LINEMAX];
 int i, j, underLineFound;
-char newText[LINEMAX];
-
-int count = 0;
+char newText[LINEMAX + 50];
 
 
     do
@@ -1135,44 +1537,76 @@ int count = 0;
 
         if (fgets(text, LINEMAX, l))
         {
-
-            for (i = 0; i < strlen(text); i++) if (text[i] == ';') text[i] = ',';
-            i = 0;
-
-            while(text[i] != ',') {newText[i] = text[i]; i++;} newText[i] = text[i]; i++;
-            while(text[i] != ',') {newText[i] = text[i]; i++;} newText[i] = text[i]; i++;
-            while(text[i] != ',') {newText[i] = text[i]; i++;} newText[i] = text[i]; i++;
-            while(text[i] != ',') {newText[i] = text[i]; i++;} newText[i] = text[i]; i++;
-            while(text[i] != ',') {newText[i] = text[i]; i++;} newText[i] = text[i]; i++;
-
-            // gibts hier ein Underline?:
-
-            j = i;
-
-            underLineFound = 0;
-
-            while(text[j]!= ',')
+            if ((strncmp(text,"1AO",3) == 0) && (text[33] == '2')) // 03.02 Semesterzeugnis!
             {
-                if (text[j] == '_') underLineFound = 1;
-                j++;
+                sprintf(newText,"1OHIF,Schulnachricht%s", text + 28);
+                strncpy(text,newText,LINEMAX);
+                printf("%s", text);
+            }
+            if ((strncmp(text,"1AO",3) == 0) && (text[33] == '6')) // 30.06 Semesterzeugnis!
+            {
+                sprintf(newText,"1OHIF,Jahreszeugnis%s", text + 28);
+                strncpy(text,newText,LINEMAX);
+                printf("%s", text);
             }
 
-            j = i;
-            if (underLineFound)
+            if ((strncmp(text,"1BO",3) == 0) && (text[33] == '2')) // 03.02 Semesterzeugnis!
             {
-                while(text[j]!= '_') j++;
-                j++;
+                sprintf(newText,"1OHEL,Schulnachricht%s", text + 28);
+                strncpy(text,newText,LINEMAX);
+                printf("%s", text);
+            }
+            if ((strncmp(text,"1BO",3) == 0) && (text[33] == '6')) // 30.06 Semesterzeugnis!
+            {
+                sprintf(newText,"1OHEL,Jahreszeugnis%s", text + 28);
+                strncpy(text,newText,LINEMAX);
+                printf("%s", text);
             }
 
-            while(text[j]!= '\0') {newText[i] = text[j];
+            // wird nur beim ersten Durchlauf angezeigt!
 
-            i++; j++;}
-            newText[i] = '\0';
+            if ( (text[1] != 'O') ||
+                ((text[1] == 'O') && (text[6] == 'S') && (summer == 0)) ||    // hier werden entweder nur J Zeilen odeer nur S Zeilen für die O Klassen zugelassen
+                ((text[1] == 'O') && (text[6] == 'J') && (summer == 1))    )
+            {
 
-            fprintf(l_no_unders,"%s",newText);
 
-count++;
+                for (i = 0; i < strlen(text); i++) if (text[i] == ';') text[i] = ',';
+                i = 0;
 
+                while(text[i] != ',') {newText[i] = text[i]; i++;} newText[i] = text[i]; i++;
+                while(text[i] != ',') {newText[i] = text[i]; i++;} newText[i] = text[i]; i++;
+                while(text[i] != ',') {newText[i] = text[i]; i++;} newText[i] = text[i]; i++;
+                while(text[i] != ',') {newText[i] = text[i]; i++;} newText[i] = text[i]; i++;
+                while(text[i] != ',') {newText[i] = text[i]; i++;} newText[i] = text[i]; i++;
+
+                // gibts hier ein Underline?:
+
+                j = i;
+
+                underLineFound = 0;
+
+                while(text[j]!= ',')
+                {
+                    if (text[j] == '_') underLineFound = 1;
+                    j++;
+                }
+
+                j = i;
+                if (underLineFound)
+                {
+                    while(text[j]!= '_') j++;
+                    j++;
+                }
+
+                while(text[j]!= '\0') {newText[i] = text[j];
+
+                i++; j++;}
+                newText[i] = '\0';
+
+                fprintf(l_no_unders,"%s",newText);
+
+            }
         }
 
     } while (!feof(l));
@@ -1228,11 +1662,6 @@ int auswerten;
             i++;
         }
 
-        //while (text[i] != ',')   // class   diese paar Yeilen machen eigentlich gar nichts! --> loeschen
-        //{
-        //    i++;
-        //}
-
         if (tclass[0] == '1')
         {
             tclass[j] = '_'; j++;
@@ -1275,7 +1704,7 @@ int auswerten;
 
             if ((tjvs == 'S') && (text[i + 1] == 'e'))  // Semesteryeugnis!
             {
-                if (text[i - 3] == 'S') auswerten = TRUE;  // sommersemesteryeugnis!
+                if (text[i - 3] == 'S') auswerten = TRUE;  // sommersemesterzeugnis!
                 if ((tclass[0] == '2') && (tclass[2] == 'B')) auswerten = TRUE;  // Abendschule Sommer
                 if ((tclass[0] == '4') && (tclass[2] == 'B')) auswerten = TRUE;  // Abendschule Sommer
                 if ((tclass[0] == '6') && (tclass[2] == 'B')) auswerten = TRUE;  // Abendschule Sommer
@@ -1361,6 +1790,9 @@ int auswerten;
 //            printf("keine Note!  %s ", text);
             tval[0] = '0';
         }
+
+
+
 
 /* Noten umleiten seit 2020 April abgeschalten!
         if (!((tval[0] >= '0') && (tval[0] <= '5')))
@@ -1448,8 +1880,7 @@ int auswerten;
                 (strncmp(tclass,"5AHELS", 6) == 0)  ||
                 (strncmp(tclass,"5BHELS", 6) == 0)      )
             {
-//#### ACHTUNG: hier muss nächstes Jahr die Liste für Wireless ergänzt werden!
-                if (strncmp(tstundentafel,"8628_01", 7) == 0)   // 8376 war 2020 in der 5ten die Stundentafel
+                if (strncmp(tstundentafel,"8628_01", 7) == 0)
                 {
                     tclass[6] = 'E';
                 }
@@ -1457,8 +1888,36 @@ int auswerten;
                 {
                     tclass[6] = 'W';
                 }
-//#####
+
+                if (strncmp(tstundentafel,"8728_01", 7) == 0)
+                {
+                    tclass[6] = 'E';
+                }
+                else
+                {
+                    tclass[6] = 'W';
+                }
+
+                // #### mit dem neuen Schwerpunkten kommt es hier zu neuen Nummern!  erstmals 2024 / 2025 im Semester!
+
+
             }
+/*
+if (strncmp(tclass,"1OHEL",5) == 0)
+{
+    if (strncmp(tname,"Furmanov", 8) == 0)
+    {
+        printf("#\n");
+
+        if (auswerten == TRUE) printf("%-10s,%c,", tclass,tjvs /*stundentafel* /);  // Klassen auf 10 Zeichen mit Blanks auffüllen
+        if (auswerten == TRUE) printf("%s,%s,",tname,tvorname);
+        if (auswerten == TRUE) printf("%s,%s,",tsub,tval);
+
+
+    }
+
+}
+*/
 
             if (auswerten == TRUE) fprintf(t, "%-10s,%c,", tclass,tjvs /*stundentafel*/);  // Klassen auf 10 Zeichen mit Blanks auffüllen
             if (auswerten == TRUE) fprintf(t,"%s,%s,",tname,tvorname);
@@ -1748,16 +2207,6 @@ float cRang[14] = {0};
 
         cRang[c] += atof(num);  // damit wird der Notenschnitt innerhalb der Klasse aufsummiert.
 
-/* Sommersemester ...... */
-#ifdef SOMMERSEMMESTER_MIT_5xHELS_4FEL  //--- das ist noch etwas seltsam???
-        if ((tab[i][j+1] == '5') ||
-           ((tab[i][j+1] == '4') && (tab[i][j+3] == 'F')))
-        {
-              fprintf(so," ,%d,%s,%s",  rang[c],(rang[c] == 1)? "Klassenbester/beste":" ",tab[i]);
-        }
-        else
-#endif
-/* Sommersemester end */
         {
             r++; // Reihung
             s++;
@@ -2154,29 +2603,20 @@ int getAllSubsOfThisClass(int j, int i, char(*t)[SMAX], char (*subs)[30])
     char newSubName[30];
     char secSubName[30];
     int verhInList = -1;
-
-
     int l, m, n,  listLength = 0, subAlreadyInList;
 
     for (q = j; q < i; q++)
     {
-
-        //printf("%s", t[q]);
-
         r = 0;
         while(t[q][r] != ',') {r++;} r++;
         while(t[q][r] != ',') {r++;} r++;
         while(t[q][r] != ',') {r++;} r++;
         while(t[q][r] != ',') {r++;} r++;
-        //while(t[q][r] != ',') r++; r++;
-        //while(t[q][r] != ',') r++; r++;
 
         //erster Gegenstand gefunden
 
-
         while((t[q][r] != '\0') && (t[q][r] != '\n'))
         {
-
             x = 0;
             while(t[q][r] != ',')
             {
@@ -2186,10 +2626,7 @@ int getAllSubsOfThisClass(int j, int i, char(*t)[SMAX], char (*subs)[30])
             }
             newSubName[x] = '\0';
 
-
-        // printf(".%s.\n", newSubName);  // neuer Gegenstand gefunden.
-
-        // gibt es den schon in der SubListe ?
+// printf(".%s.\n", newSubName);  // neuer Gegenstand gefunden.    // gibt es den schon in der SubListe ?
 
             subAlreadyInList = 0;
 
@@ -2198,7 +2635,7 @@ int getAllSubsOfThisClass(int j, int i, char(*t)[SMAX], char (*subs)[30])
                 if (strcmp(newSubName, subs[l]) == 0)
                 {
                     subAlreadyInList = 1;
-                    //printf("Sub %s bereits in Liste!\n", newSubName);
+                     //printf("Sub %s bereits in Liste!\n", newSubName);
                     l = listLength;
                 }
             }
@@ -2206,7 +2643,7 @@ int getAllSubsOfThisClass(int j, int i, char(*t)[SMAX], char (*subs)[30])
             if (subAlreadyInList == 0)
             {
                 listLength++;
-            //printf("\nneuer Name gefunden... %d\n", listLength);
+                //printf("\nneuer Name gefunden... %d\n", listLength);
                 sprintf(subs[l],"%s",newSubName);
             }
 
@@ -2225,14 +2662,9 @@ int getAllSubsOfThisClass(int j, int i, char(*t)[SMAX], char (*subs)[30])
                 (t[q][r] != '\n')) r++;
 
         } // while ! \0  repeat!!
-
-
-
-
     }
 
     // Gegenstände sortieren:
-
     // falls verh in Liste - sollte es als erstes stehen
 
     for(m = 0; m < listLength; m++)
@@ -2267,12 +2699,6 @@ int getAllSubsOfThisClass(int j, int i, char(*t)[SMAX], char (*subs)[30])
             }
         }
     }
-
-
-//    for (l = 0; l < listLength; l++) printf(".%s", subs[l]);
-//    printf("\n%d\n", listLength);
-
-    //getch();
 
     return listLength;
 }
@@ -2451,10 +2877,14 @@ int getSubId(char * sub)
 
 
 
-
-int getClassId(char * className, int SJ, int summer)
+int getClassId(char * className, int summer)
 {
 int ret = -1;
+
+// der Unterschied sommer oder winter ist im Grunde nur für die 4AFELC von Bedeutung!
+//#####
+
+// Frage: wo kommen die E und W her?
 
     if      (strncmp(className,"1AFELC_S",  8) == 0) ret = 0;
     else if (strncmp(className,"1AFELC_J",  8) == 0) ret = 1;
@@ -2564,7 +2994,7 @@ int i, j, k, l;
 
     writeF(&protCut, fName);
 
-    // yuerst filten wir alle Begruendungszeilen aus:
+    // zuerst filtern wir alle Begruendungszeilen aus:
 
     do
     {
