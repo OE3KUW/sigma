@@ -4,7 +4,7 @@
 //                              Σ i g m a 2 4
 //
 //
-//                                                              қuran jan 2024
+//                                                              қuran 2024
 //*****************************************************************************
 // history:
 // 2023.06 refactoring; mah Liste einbezogen
@@ -44,7 +44,7 @@
 #include "console.h"
 
 
-#define LINEMAX             800
+#define LINEMAX            1000
 #define LEN                 200
 #define SMAX                800
 #define TRUE                  1
@@ -288,6 +288,7 @@ int gesN = 0, gesS = 0; // gesamt Zahl 5er einschließlich N, gesamt Zahl Schül
 //*****************************************************************************
 //                                 m a i n
 //*****************************************************************************
+
 int main(void)
 {
 FILE * liste, * listNoUnder, * tab, * fehl, * allTab, * notes, * percent,
@@ -344,7 +345,7 @@ int summer; // if TRUE check die Jahresnote e.g. SS   else Semesternote e.g. WS
 
     textcolor(RED);
     printf("-------------------------------------------------------------------------------\n");
-    printf("                                 s i g m a   2023                              \n");
+    printf("                                 Σ i g m a   2 4                               \n");
     printf("-------------------------------------------------------------------------------\n");
     textcolor(WHITE);
 
@@ -385,16 +386,16 @@ int summer; // if TRUE check die Jahresnote e.g. SS   else Semesternote e.g. WS
 
 
 #ifdef __linux__
-    sprintf(command,"mkdir ./%c%c%c%c%c%c", dir[0], dir[1], dir[2], dir[3], dir[4]);
+    sprintf(command,"mkdir ./%c%c%c%c%c", dir[0], dir[1], dir[2], dir[3], dir[4]);
 #else
-    sprintf(command,"mkdir   %c%c%c%c%c%c", dir[0], dir[1], dir[2], dir[3], dir[4]);
+    sprintf(command,"mkdir   %c%c%c%c%c", dir[0], dir[1], dir[2], dir[3], dir[4]);
 #endif
 
     printf("\n%s\n", command);
     system(command);
 
 #ifdef __linux__
-    sprintf(command,"cp   ./Liste.csv       ./%c%c%c%c%c%c/Liste.csv", dir[0], dir[1], dir[2], dir[3], dir[4]);
+    sprintf(command,"cp   ./Liste.csv       ./%c%c%c%c%c/Liste.csv", dir[0], dir[1], dir[2], dir[3], dir[4]);
 #else
     sprintf(command,"copy \"Liste.csv\"   \"./%c%c%c%c%c/Liste.csv\"", dir[0], dir[1], dir[2], dir[3], dir[4]);
 
@@ -407,10 +408,10 @@ getch();
 
     clrscr();
 
-    gotoxy(0,0); printf("--------------------------------------------------------------------------------");
-    gotoxy(0,1); printf("Liste.csv is stored in %s", dir);
-    gotoxy(0,2); printf("--------------------------------------------------------------------------------");
-    gotoxy(0,3);
+    gotoxy(0,1); printf("--------------------------------------------------------------------------------");
+    gotoxy(0,2); printf("Liste.csv is stored in %s", dir);
+    gotoxy(0,3); printf("--------------------------------------------------------------------------------");
+    gotoxy(0,4);
 
 
     if (dir[0] == 'J')
@@ -423,8 +424,6 @@ getch();
         summer = FALSE;
         printf("Semesterauswertung");
     }
-
-
 
 
     t    = (char (*)[SMAX])malloc(SMAX * 40000);  // 20k lines
@@ -1249,7 +1248,7 @@ fclose(protWI);
 
 // zuerst in tab lesen
 // ########
-// dabei aber auch umsortieren - zuallererst kommt der sigma Wert --- fals EL Sommersemester!
+// dabei aber auch umsortieren - zuallererst kommt der sigma Wert --- falls EL Sommersemester!
 
     do   // Tab wird in tab eigelesen ... Gleichzeitig werden hier Vorgezogene Prüfungen entfernt
     {
@@ -1261,10 +1260,43 @@ fclose(protWI);
             while (text[i] != '\0') {Name[j] = text[i]; i++; j++; l++;}
             Name[l - 1] = ',';
             Name[l] = '\0';
-            sprintf(tnxt, "%c%c%c%c%s%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c", text[0], text[1], text[2], text[3], Name,
-            text[4], text[5], text[6], text[7], text[8], text[9], text[10], text[11], text[12], text[13], text[14], // Klasse
-            text[18], text[19], text[20],text[21], text[22], text[23], text[24], text[25], text[26]
-              );
+
+            tnxt[0] = text[0];
+            tnxt[1] = text[1];
+            tnxt[2] = text[2];
+            tnxt[3] = text[3];
+            for (m = 0; m < l ; m++) text[4 + m ] = Name[m];
+            tnxt[ 4 + l] = text[4];
+            tnxt[ 5 + l] = text[5];
+            tnxt[ 6 + l] = text[6];
+            tnxt[ 7 + l] = text[7];
+            tnxt[ 8 + l] = text[8];
+            tnxt[ 9 + l] = text[9];
+            tnxt[10 + l] = text[10];
+            tnxt[11 + l] = text[11];
+            tnxt[12 + l] = text[12];
+            tnxt[13 + l] = text[13];
+            tnxt[14 + l] = text[14];
+
+            tnxt[15 + l] = text[18];
+            tnxt[16 + l] = text[19];
+            tnxt[17 + l] = text[20];
+            tnxt[18 + l] = text[21];
+            tnxt[19 + l] = text[22];
+            tnxt[20 + l] = text[23];
+            tnxt[21 + l] = text[24];
+            tnxt[22 + l] = text[25];
+            tnxt[23 + l] = text[26];
+
+            //sprintf(tnxt, "%c%c%c%c%s%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c",
+            //            //  1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5
+            //text[0],  text[1],  text[2],  text[3],  Name,
+            //text[4],  text[5],  text[6],  text[7],  text[8],
+            //text[9],  text[10], text[11], text[12], text[13],
+            //text[14], // Klasse
+            //          text[18], text[19], text[20], text[21],
+            //text[22], text[23], text[24], text[25], text[26]
+            //  );
             tnxt[l + 4 + 11 + 9] = '\0';
 
             fprintf(sigmaList,"%s\n",tnxt);
@@ -1786,8 +1818,11 @@ int auswerten;
 
         if (j == 0)
         {
-            if (auswerten == TRUE) fprintf(fehl, "keine Note! %s", text);
-//            printf("keine Note!  %s ", text);
+            //if (auswerten == TRUE) fprintf(fehl, "keine Note! %s", text);
+
+            fprintf(fehl, "keine Note! %s", text);
+            printf("keine Note!  %s ", text);
+
             tval[0] = '0';
         }
 
@@ -2968,7 +3003,7 @@ void CutNames(char * fromFile, char * directory)
 {
 FILE * prot,  * protCut;
 char fName[LEN];
-char text[LEN];
+char text[LINEMAX];
 char dir[LEN];
 char file[LEN];
 char textCutted[LEN];
@@ -3027,7 +3062,8 @@ int i, j, k, l;
 
         if (!feof(prot))
         {
-            sprintf(textCutted,"%s", text);
+            //sprintf(textCutted,"%s", text);
+            strncpy(textCutted, text, strlen(text));
             i = 25;
 
             if (text[12] != ' ')
