@@ -7,6 +7,7 @@
 //                                                              қuran 2024
 //*****************************************************************************
 // history:
+// 2024 01 Stundentafeln für Bionics, Wireless und Embeded systems vorbereitet
 // 2023.06 refactoring; mah Liste einbezogen
 // 2022.05 automatische Verzeichnisse für das Jahr und Monat erstellt
 // 2022.06 Abhaengig vom Monat Daten des Wintersemesters (123456) oder SS entw.
@@ -31,7 +32,8 @@
 // Exportieren als Liste.csv - ACHTUNG SEMIKOLOM
 // 2.)  define Jahresschluss richtigstellen,
 // 3.)  sind in der Liste , als Trenner verwendet / falls nein, aendern!!!
-// sokrates > Auswertung > Standard > 152 > FW-Datum, FW-Lehrer, Gegenst, Art
+// sokrates > Auswertung > Standard > 152 > FW-Datum, Gegenstand, LehrerIn, Art
+// speichern unter: home>sigma>Mah.csv
 //*****************************************************************************
 // next steps:
 // erweitere Linux Version
@@ -44,7 +46,7 @@
 #include "console.h"
 
 
-#define LINEMAX            1000
+#define LINEMAX            8000
 #define LEN                 200
 #define SMAX                800
 #define TRUE                  1
@@ -52,7 +54,11 @@
 
 #define SELTSAME_NOTEN_AUSGEBEN
 
-//                  0 1 2 3 4 5 6 7   8 9 0 1 2 3 4 5 6 7 8 9 a b   c d e f g
+    /**┌────────────────────────────────────────────────┐**/
+    /**  G l o b a l e  Variablen                        **/
+
+
+//                  0 1 2 3 4 5 6 7   8 9 0 1 2 3 4 5 6 7 8 9 0 1   2 3 4 5 6
 //                  1 1 2 2 3 3 4 4   1 1 2 2 3 3 4 4 4 4 5 5 5 5   1 2 3 4 5
 //                  F F F F F F F F   H H H H H H H H H H H H H H   H H H H H
 //                  S J W S W W W S   S J W S W S W S W S S J S J   S W W W S
@@ -93,50 +99,53 @@ int weight[][27] = {
 /*NEW */           {0,0,0,0,0,0,0,0,  0,0,0,0,0,0,0,0,0,0,0,0,0,0,  0,1,1,2,2}, // bionics
 /*NEW */           {0,0,0,0,0,0,0,0,  0,0,0,0,0,0,0,0,0,0,0,0,0,0,  0,1,1,2,2}, // embedded
 /*FOEX*/           {1,1,1,1,1,1,1,1,  1,1,1,1,1,1,1,1,1,1,1,1,1,1,  1,1,1,1,1},
+/*WIRE*/           {0,0,0,0,0,0,0,0,  0,0,0,0,0,0,0,0,0,0,0,0,0,0,  0,1,1,2,2},
+/*BION*/           {0,0,0,0,0,0,0,0,  0,0,0,0,0,0,0,0,0,0,0,0,0,0,  0,1,1,2,2},
+/*EMBE*/           {0,0,0,0,0,0,0,0,  0,0,0,0,0,0,0,0,0,0,0,0,0,0,  0,1,1,2,2},
 /*ORC5*/           {1,1,1,1,1,1,1,1,  1,1,1,1,1,1,1,1,1,1,1,1,1,1,  1,1,1,1,1}  // bringt das eine Notenschnittsverbesserung ?
 };
 
  char SubNames[][LINEMAX] =
     {
-    "Englisch                                                                       ",
-    "Naturwissenschaftliche Grundlagen                                              ",
-    "Deutsch und Kommunikation                                                      ",
-    "Softwaretechnik                                                                ",
-    "Netzwerktechnik - Werkstätte und Produktionstechnik                            ",
-    "Angewandte Mathematik                                                          ",
-    "Computer- und Netzwerktechnik                                                  ",
-    "Angewandte Elektronik                                                          ",
-    "Geografie                                                                      ",
-    "Elektronik - Werkstätte und Produktionstechnik                                 ",
-    "Naturwissenschaften                                                            ",
-    "Elektronik Design                                                              ",
-    "Fachspezifische Softwaretechnik                                                ",
-    "Hardwareentwicklung                                                            ",
-    "Antriebstechnik und Mechatronik                                                ",
-    "Computerunterstützte Projektentwicklung                                        ",
-    "Angewandte Informatik                                                          ",
-    "Datenbanken und Informationssysteme                                            ",
-    "Programmieren und Software Engineering                                         ",
-    "Energiesysteme - Werkstätte und Produktionstechnik                             ",
-    "Energiesysteme                                                                 ",
-    "Bewegung und Sport                                                             ",
-    "Betriebswirtschaft und Management                                              ",
-    "Antriebstechnik und Mechatronik                                                ",
-    "Antriebstechnik und Mechatronik - Werkstätte und Produktionstechnik            ",
-    "Automatisierungstechnik                                                        ",
-    "Computergestützte Projektentwicklung                                           ",
-    "Fertigungstechnik 1                                                            ",
-    "Konstruktion und Projektmanagement                                             ",
-    "Elektrotechnik und Automatisierungstechnik                                     ",
-    "Fertigungstechnik 1 - Werkstätte und Produktionstechnik                        ",
-    "Betriebstechnik                                                                ",
-    "Produktionstechnologie und Werkstoffe                                          ",
-    "Informatik und Informationssysteme                                             ",
-    "Technische Mechanik und Berechnung                                             ",
-    "Werkstätte und Produktionstechnik                                              ",
-    "Elektrotechnik und Elektronik                                                  ",
-    "Maschinen und Anlagen                                                          ",
-    "Wirtschaft und Recht                                                           ",
+/*AELT*/    "Englisch                                                                       ",
+/*AM  */    "Naturwissenschaftliche Grundlagen                                              ",
+/*BESP*/    "Deutsch und Kommunikation                                                      ",
+/*COIT*/    "Softwaretechnik                                                                ",
+/*CTNT*/    "Netzwerktechnik - Werkstätte und Produktionstechnik                            ",
+/*D   */    "Angewandte Mathematik                                                          ",
+/*DUK */    "Computer- und Netzwerktechnik                                                  ",
+/*DIC1*/    "Angewandte Elektronik                                                          ",
+/*E1  */    "Geografie                                                                      ",
+/*E2  */    "Elektronik - Werkstätte und Produktionstechnik                                 ",
+/*ELDE*/    "Naturwissenschaften                                                            ",
+/*ELWP*/    "Elektronik Design                                                              ",
+/*FSST*/    "Fachspezifische Softwaretechnik                                                ",
+/*GGP */    "Hardwareentwicklung                                                            ",
+/*HWE1*/    "Antriebstechnik und Mechatronik                                                ",
+/*KMEL*/    "Computerunterstützte Projektentwicklung                                        ",
+/*KSN1*/    "Angewandte Informatik                                                          ",
+/*LAB */    "Datenbanken und Informationssysteme                                            ",
+/*MTRS*/    "Programmieren und Software Engineering                                         ",
+/*NNWP*/    "Energiesysteme - Werkstätte und Produktionstechnik                             ",
+/*NW2 */    "Energiesysteme                                                                 ",
+/*NWG */    "Bewegung und Sport                                                             ",
+/*PBE */    "Betriebswirtschaft und Management                                              ",
+/*R   */    "Antriebstechnik und Mechatronik                                                ",
+/*RK  */    "Antriebstechnik und Mechatronik - Werkstätte und Produktionstechnik            ",
+/*REL */    "Automatisierungstechnik                                                        ",
+/*ETH */    "Computergestützte Projektentwicklung                                           ",
+/*SOTE*/    "Fertigungstechnik 1                                                            ",
+/*UNF */    "Konstruktion und Projektmanagement                                             ",
+/*WIR3*/    "Elektrotechnik und Automatisierungstechnik                                     ",
+/*SOPK*/    "Fertigungstechnik 1 - Werkstätte und Produktionstechnik                        ",
+/*NEW */    "Betriebstechnik                                                                ",
+/*NEW */    "Produktionstechnologie und Werkstoffe                                          ",
+/*NEW */    "Informatik und Informationssysteme                                             ",
+/*FOEX*/    "Technische Mechanik und Berechnung                                             ",
+/*WIRE*/    "Werkstätte und Produktionstechnik                                              ",
+/*BION*/    "Elektrotechnik und Elektronik                                                  ",
+/*EMBE*/    "Maschinen und Anlagen                                                          ",
+/*ORC5*/    "Wirtschaft und Recht                                                           ",
     "Prozessmanagement                                                              ",
     "Laboratorium                                                                   ",
     "Anlagen- und Prüftechnik                                                       ",
@@ -167,47 +176,51 @@ int weight[][27] = {
     "Logistik                                                                       ",
     "Konstruktion und Design                                                        "
     };
+
+
+
+
 char SubN[][20] =
 {
-    "E                 ",
-    "NWG               ",
-    "DUK               ",
-    "SOTE              ",
-    "NWWP              ",
-    "AM                ",
-    "CTNT              ",
-    "AELT              ",
-    "GGP               ",
-    "ELWP              ",
-    "NW2               ",
-    "ELDE              ",
-    "FSST              ",
-    "HWE1              ",
-    "ANTMT             ",
-    "CPE               ",
-    "AINF              ",
-    "DBI               ",
-    "POS1              ",
-    "ES                ",    // ?? ES_3, ES_4
-    "ES1               ",
-    "BESP              ",
-    "BWM               ",
-    "ANTMT             ",
-    "ANTMTWP           ",
-    "AUT               ",
-    "CPE               ",
-    "FET1              ",
-    "KOP1              ",
-    "ETAT              ",
-    "FET1WP            ",     // ?? FET1WP_3, FET1WP_4
-    "BET               ",
-    "PROTWE            ",
-    "INFI              ",
-    "TMB               ",
-    "WPT               ",
-    "ETE               ",
-    "MANL              ",
-    "WIR               ",       // ??
+/*AELT*/    "E                 ",
+/*AM  */    "NWG               ",
+/*BESP*/    "DUK               ",
+/*COIT*/    "SOTE              ",
+/*CTNT*/    "NWWP              ",
+/*D   */    "AM                ",
+/*DUK */    "CTNT              ",
+/*DIC1*/    "AELT              ",
+/*E1  */    "GGP               ",
+/*E2  */    "ELWP              ",
+/*ELDE*/    "NW2               ",
+/*ELWP*/    "ELDE              ",
+/*FSST*/    "FSST              ",
+/*GGP */    "HWE1              ",
+/*HWE1*/    "ANTMT             ",
+/*KMEL*/    "CPE               ",
+/*KSN1*/    "AINF              ",
+/*LAB */    "DBI               ",
+/*MTRS*/    "POS1              ",
+/*NNWP*/    "ES                ",    // ?? ES_3, ES_4
+/*NW2 */    "ES1               ",
+/*NWG */    "BESP              ",
+/*PBE */    "BWM               ",
+/*R   */    "ANTMT             ",
+/*RK  */    "ANTMTWP           ",
+/*REL */    "AUT               ",
+/*ETH */    "CPE               ",
+/*SOTE*/    "FET1              ",
+/*UNF */    "KOP1              ",
+/*WIR3*/    "ETAT              ",
+/*SOPK*/    "FET1WP            ",     // ?? FET1WP_3, FET1WP_4
+/*NEW */    "BET               ",
+/*NEW */    "PROTWE            ",
+/*NEW */    "INFI              ",
+/*FOEX*/    "TMB               ",
+/*WIRE*/    "WPT               ",
+/*BION*/    "ETE               ",
+/*EMBE*/    "MANL              ",
+/*ORC5*/    "WIR               ",       // ??
     "PRMN              ",
     "LA1               ",
     "APT1              ",
@@ -237,20 +250,18 @@ char SubN[][20] =
     "UFW               ",
     "LO1               ",      // LO ??
     "KODES             "
-};
 
 
-    /**┌────────────────────────────────────────────────┐**/
-    /**                 global variables:                **/
-    /**└────────────────────────────────────────────────┘**/
-/*
-typedef struct weight WEIGHT;
-struct weight
-{
-    char name[8]; // Gegenstandsbezeichnung
-    int w;        // Wochenstundenzahl = Gewicht
+
+
+
+
+
+
+
+
+
 };
-*/
 
 
 int readF(FILE ** f, const char * s);
@@ -283,18 +294,21 @@ int getSubId(char * sub);
 void CutNames(char * fromFile, char * directory);
 int procN[14] = {0}; // 0 == 1AFELC; 1 == 1AHELS; 2 == 1BHELS e.g.
 int gesN = 0, gesS = 0; // gesamt Zahl 5er einschließlich N, gesamt Zahl Schüler
+int mCounter;
+char dir[LEN];  // J2023
 
 
-//*****************************************************************************
-//                                 m a i n
-//*****************************************************************************
+
+
+    /******************************************************/
+    /**                    m a i n                       **/
+    /******************************************************/
 
 int main(void)
 {
 FILE * liste, * listNoUnder, * tab, * fehl, * allTab, * notes, * percent,
      * sigmaList, * protEL, * protET, * protIF, * protMB, *mah,
-     * protWI, * check, * wel,
-     * procEL, * negList;
+     * protWI, * check, * wel /* procEL  negList*/;
 char text[LINEMAX];
 char tnxt[LINEMAX];
 char FamNam[LINEMAX];
@@ -325,7 +339,6 @@ float sigmaValue;
 char sigmaValueBefore[LINEMAX];
 time_t ti = time(NULL);
 struct tm tm = *localtime(&ti);
-char dir[LEN];
 char answer[LEN];
 char command[LEN];
 char mahnClass[LEN];
@@ -432,8 +445,14 @@ getch();
 
     sId = 0;
 
+    mCounter = 0;
+
+
 
     if (!t) {printf("\nzu wenig Speicher!\n"); exit(-1);}   // in t wird später das ganze File allTabs eingelesen
+
+
+
 
     gotoxy(0, 6); printf("Initialisierungen abgeschlossen ...... weiter?\n");
     getch();
@@ -480,8 +499,11 @@ getch();
     writeF(&fehl, "./Fehler.csv");
     writeF(&allTab, "./allTab.csv"); // Übersicht über alle Klassen aller Abteilungen
 
+printf("hier 1!\n");
 
     list2tab(liste, tab, fehl, allTab, summer);
+
+printf("hier 2!\n");
 
     // zunächst sollen alle Daten aller Abteilungen weggespeichert werden.
 
@@ -493,6 +515,9 @@ getch();
 
     i = 0;
 
+printf("hier 3!\n");
+
+
     do   // Tab wird in tab eigelesen ... Gleichzeitig werden hier Vorgezogene Prüfungen entfernt
     {
         fgets(text, LINEMAX, tab);
@@ -501,6 +526,9 @@ getch();
     } while (!feof(tab));
 
     fclose(tab);
+
+printf("hier 4!\n");
+
 
     sort(t, i); // dadurch werden Schüler mit "nur" vorläufigen Zeugnissen miteinsortiert in ihre Klassen
 
@@ -552,6 +580,8 @@ EL;5;01;1AHELS_J  ;HWE1;Relota;Nicola;
 EL;N;06;1AHELS_J  ;AM;Seidl;Alex;
 */
 
+printf("$3 hier 1!\n");
+
     do   // Tab wird in tab eigelesen ... Gleichzeitig werden hier Vorgezogene Prüfungen entfernt
     {
         fgets(text, LINEMAX, tab);
@@ -579,6 +609,9 @@ EL;N;06;1AHELS_J  ;AM;Seidl;Alex;
 
     sprintf(compClass,"%c%c%c%c%c%c%c%c%c%c", t[j][0], t[j][1], t[j][2], t[j][3], t[j][4], t[j][5], t[j][6], t[j][7], t[j][8], t[j][9] );
 
+printf("$3 hier 2!\n");
+
+
     for (i = 0; i < lines; i++)    // für alle Einträge
     {
         if ((compClass[0] != t[i][0]) ||           // 5
@@ -594,6 +627,7 @@ EL;N;06;1AHELS_J  ;AM;Seidl;Alex;
 //            (compClass[9] != t[i][9])
 )
        {   // eine neue Klasse wurde gefunden - daher wird die bisherige nun als Block ausgewertet:
+
 
 
        /**
@@ -622,6 +656,10 @@ EL;N;06;1AHELS_J  ;AM;Seidl;Alex;
             // somit wissen wir, wieviele Gegenstände es in dieser Klasse gibt (nSubs) und auch welche (subs)
 
             // Arrays mit lauter Null-Einträgen wird vorbereitet:
+
+printf("$3 hier 3!\n");
+
+
 
             for (k = 0; k < nSubs; k++) subs5Anz[k] = subs5Prozent[k] = subsNAnz[k] = 0;
 
@@ -677,6 +715,7 @@ EL;N;06;1AHELS_J  ;AM;Seidl;Alex;
                 fprintf(notes,","); r++;
 
 
+printf("$3 a");
 
 
 
@@ -694,6 +733,9 @@ EL;N;06;1AHELS_J  ;AM;Seidl;Alex;
                 sprintf(qualifier,"%s",t[j]+r);
 
                 s = (s / 2) + 50;  // Umlaute, Sonderezeichen...
+
+printf("$3 b");
+
 
                 while(r < s) {fprintf(notes," "); r++;} fprintf(notes,",");
 
@@ -718,6 +760,7 @@ EL;N;06;1AHELS_J  ;AM;Seidl;Alex;
 //################################################################
 
 
+printf("$3 c");
 
 
                 gefunden = 0;
@@ -726,7 +769,6 @@ EL;N;06;1AHELS_J  ;AM;Seidl;Alex;
 
                 while((r < (strlen(qualifier) - strlen(subs[k]))) && (gefunden == 0))
                 {
-
                     if ((strncmp(subs[k], qualifier + r, strlen(subs[k])) == 0)  &&
                         (qualifier[ + r + strlen(subs[k])] == ','))
                     {
@@ -734,7 +776,7 @@ EL;N;06;1AHELS_J  ;AM;Seidl;Alex;
                         // gefunden
                         //printf("* --> %s", qualifier + r);
 
-                        if (cId) sId = getSubId(subs[k]);  // liefert die Zeilennummer der Gewichtstabelle
+                        if (cId >= 0) sId = getSubId(subs[k]);  // liefert die Zeilennummer der Gewichtstabelle  ... > 0 damit keine andere Abteilungen ....... den die haben -1 !!!
 
 
 //#######
@@ -810,7 +852,7 @@ Anzahl der 5er, Monat Tag Jahr der letzten Mahnung,  Lehrer...
                           *
                           *
                           **/
-
+printf("$3 d");
 
                         if (qualifier[ + r + strlen(subs[k]) + 1]  == '5') subs5Anz[k]++;  // hier sind die Noten !!!
                         if (qualifier[ + r + strlen(subs[k]) + 1]  == 'N') subs5Anz[k]++;  // hier sind die Noten !!!
@@ -837,7 +879,7 @@ Anzahl der 5er, Monat Tag Jahr der letzten Mahnung,  Lehrer...
 
             //fprintf(notes,"\n");
             //fprintf(notes,"\nVGL: %s",t[j]);
-
+printf("$3 e");
             if (n > 0)
             {
                 fprintf(notes,"|%d.%06d|\n", w / n, (w*1000000/n)%1000000);
@@ -846,10 +888,6 @@ Anzahl der 5er, Monat Tag Jahr der letzten Mahnung,  Lehrer...
             {
                 fprintf(notes,"\n");
             }
-
-
-
-
         }
 
         //Vorbereitung auf die nächste Klasse:
@@ -864,6 +902,7 @@ Anzahl der 5er, Monat Tag Jahr der letzten Mahnung,  Lehrer...
 //fprintf(percent,"%c%c,", t[j][3], t[j][4]); // Abteilungszugehörigkeit
 //while(t[j][r] != ',') {fprintf(percent,"%c", t[j][r]); r++;}
 
+printf("$3 f");
 
         for (k = 0; k < nSubs; k++)
         {
@@ -874,40 +913,48 @@ fprintf(percent,"%s;%d;%d; %d,%03d\n", subs[k], subs5Anz[k], subsNAnz[k], (subs5
         (subsNAnz[k] > 0) ? (1000*subs5Anz[k])/subsNAnz[k]:0);
         }
 
+printf("$3 g");
+
         if ((2 * numberOfMembersWith5N) >=   numberOfMembers)
         {
             fprintf(notes,"%c%c,%s,  ,#########, Anzahl der Schueler mit NG  bzw. NB mehr als 50 %% -> Begruendung durch den Jahrgangsvorstand erforderlich,\n", Abt[0], Abt[1], ClassName); // ENDE DER KLASSE!!!
         }
 
             fprintf(notes,"%c%c,%s,  ,         , Anzahl der 5 bzs. N je Gegenstand:   ,,,", Abt[0], Abt[1], ClassName); // ENDE DER KLASSE!!!
-
+printf("$3 h");
         for (k = 0; k < nSubs; k++)
         {
+
             l = 0;
-            while (l < strlen(subs[k]) - 1) {fprintf(notes," "); l++;}
+            while (l < (int)(strlen(subs[k]) - 1))
+            {
+                fprintf(notes," ");
+                l++;
+printf("l = %05d strlen %05d k = %05d %s.\n", l, (strlen(subs[k]) - 1), k, subs[k]);
+            }
             fprintf(notes,",%2d,",subs5Anz[k]);
         }
         fprintf(notes,"\n");
-
+printf("$3 i");
             fprintf(notes,"%c%c,%s,  ,         , Anzahl der Noten dieses Fachs:       ,,,", Abt[0], Abt[1], ClassName);
 
         for (k = 0; k < nSubs; k++)
         {
             l = 0;
-            while (l < strlen(subs[k]) - 1) {fprintf(notes," "); l++;}
+            while (l < (int)(strlen(subs[k]) - 1)) {fprintf(notes," "); l++;}
             fprintf(notes,",%2d,",subsNAnz[k]);
         }
         fprintf(notes,"\n");
-
+printf("$3 j");
 
         fprintf(notes,"%c%c,%s,  ,         , in Prozent  ab 30 %% -> Begruendung!  ,,,", Abt[0], Abt[1], ClassName);
 
         for (k = 0; k < nSubs; k++) subsNAnzListe[k] = 0;
-
+printf("$3 k");
         for (k = 0; k < nSubs; k++)
         {
             l = 0;
-            while (l < strlen(subs[k]) - 1) {fprintf(notes," "); l++;}
+            while (l < (int)(strlen(subs[k]) - 1)) {fprintf(notes," "); l++;}
             fprintf(notes,",%2d,", (subsNAnz[k] == 0)? 0:(int)((subs5Anz[k] * 100.) / subsNAnz[k]));
 
             if ((int)((subs5Anz[k] * 100.) / subsNAnz[k])  >= 30.)
@@ -916,6 +963,8 @@ fprintf(percent,"%s;%d;%d; %d,%03d\n", subs[k], subs5Anz[k], subsNAnz[k], (subs5
             }
 
         }
+
+printf("$3 l");
 
         fprintf(notes,"\n"); // ENDE DER KLASSE!!!
 
@@ -1326,9 +1375,6 @@ fclose(protWI);
     readF(&wel, "./Wiederholungspruefungen.csv");
     readF(&mah, "./Mah.csv");
 
-
-
-
 /*
 Klasse,Familienname,Vorname,Geburtsdatum,Gegenstand,FW-Datum,LehrerIn,FW-Art,FW-Anmerkung,,,,
 1ABMB,Guthan,Florian,06.09.1998,Englisch,04.05.2023,Vrana Philip,Mahnung,,,,,
@@ -1463,7 +1509,9 @@ Klasse,Familienname,Vorname,Geburtsdatum,Gegenstand,FW-Datum,LehrerIn,FW-Art,FW-
                 t[m][24] = Date[9];
                 t[m][32]++;
 //                printf("m: %d %s", m, t[m]);
-printf("*"); // gefunden
+mCounter++;
+printf("* %s, %s\n", Teacher, NextClass); // gefunden
+
 
             }
 
@@ -1487,7 +1535,7 @@ printf("*"); // gefunden
 
     fclose(mah);
 
-
+printf("%d Mahnungen konnten zugeordnet werden\n", mCounter);
 
 
 
@@ -1500,6 +1548,11 @@ printf("*"); // gefunden
     for (j = 0; j < i; j++) fprintf(wel,"%s", t[j]);
 
     fclose(wel);
+
+
+printf("%d 5er wurden gefunden\n", j);
+
+
 }
     /**└────────────────────────────────────────────────┘**/
 
@@ -1671,10 +1724,11 @@ int ojg, ohf, oab;
 int zeile = 1;
 
 int auswerten;
-
+int length;
 
     fgets(text, LINEMAX, l); // Klasse,Zeugnisart,Zeugnisdatum,Familienname,Vorname,Kurzbezeichnung,Note,Schulformkennzahl
 
+printf("hier sub 1!\n");
 
     jg = hf = ab = no = n = 0;
 
@@ -1682,154 +1736,180 @@ int auswerten;
     {
         fgets(text, LINEMAX, l);
 
+        length = strlen(text);
         zeile++;
 
-        i = 0;
-        j = 0;
-        while ((text[i] != ',') /*&& (text[i] != '_')*/)   // class:  _WS  _SS abschneiden
-        // für die weitere Arbeiten brauchen wir die Semesterinformation WS oder SS
+
+printf("%06d len %06d %s", zeile, length, text);
+
+        if (length > 0)
         {
+
+            i = 0;
+            j = 0;
+            while ((text[i] != ',') /*&& (text[i] != '_')*/)   // class:  _WS  _SS abschneiden
+            // für die weitere Arbeiten brauchen wir die Semesterinformation WS oder SS
+            {
             tclass[j] = text[i];
-            j++;
-            i++;
-        }
-
-        if (tclass[0] == '1')
-        {
-            tclass[j] = '_'; j++;
-            tclass[j] = text[i+1];j++;    // fügt J oder S ein
-                                        // J Jahreszeugnis
-                                        // S Schulnachricht
-        }
-
-        tclass[j] = '\0';
-
-        ojg = jg;
-        ohf = hf;
-        oab = ab;
-
-        jg = tclass[0] - '0';
-        hf = (tclass[2] == 'H') ? 0 : 1;
-        ab = ((tclass[3] == 'E') && (tclass[4] == 'L')) ? 1 :
-             ((tclass[3] == 'E') && (tclass[4] == 'T')) ? 2 :
-             ((tclass[3] == 'I') && (tclass[4] == 'F')) ? 3 :
-             ((tclass[3] == 'M') && (tclass[4] == 'B')) ? 4 :
-             ((tclass[3] == 'W') && (tclass[4] == 'I')) ? 5 : 0;
-
-
-        i++;
-        tjvs = text[i];
-
-//printf("%c\n", tjvs);   // J für Jahreszeugnis   S für Semesterzeugnis  V für Vorläufiges Zeugnis
-        if (tjvs  == 'V') {tjvs = text[i + 13]; }   // Vorläufiges Semesterzeugnis bzw. Vorläufiges Jahreszeugnis
-// das es vorläufig ist, macht nichts aus...
-//#### sicherlich noch nicht die beste Lösung!
-
-
-        auswerten = FALSE;
-
-        // summer:
-
-        if (summer == TRUE)
-        {
-            if (tjvs == 'J') auswerten = TRUE;
-
-            if ((tjvs == 'S') && (text[i + 1] == 'e'))  // Semesteryeugnis!
+                j++;
+                i++;
+            }
+printf("a");
+            if (tclass[0] == '1')
             {
-                if (text[i - 3] == 'S') auswerten = TRUE;  // sommersemesterzeugnis!
-                if ((tclass[0] == '2') && (tclass[2] == 'B')) auswerten = TRUE;  // Abendschule Sommer
-                if ((tclass[0] == '4') && (tclass[2] == 'B')) auswerten = TRUE;  // Abendschule Sommer
-                if ((tclass[0] == '6') && (tclass[2] == 'B')) auswerten = TRUE;  // Abendschule Sommer
-                if ((tclass[0] == '8') && (tclass[2] == 'B')) auswerten = TRUE;  // Abendschule Sommer
+                tclass[j] = '_'; j++;
+                tclass[j] = text[i+1];j++;    // fügt J oder S ein
+                                            // J Jahreszeugnis
+                                            // S Schulnachricht
+            }
+printf("    b");
+
+            tclass[j] = '\0';
+
+            ojg = jg;
+            ohf = hf;
+            oab = ab;
+
+            jg = tclass[0] - '0';
+            hf = (tclass[2] == 'H') ? 0 : 1;
+            ab = ((tclass[3] == 'E') && (tclass[4] == 'L')) ? 1 :
+                 ((tclass[3] == 'E') && (tclass[4] == 'T')) ? 2 :
+                 ((tclass[3] == 'I') && (tclass[4] == 'F')) ? 3 :
+                 ((tclass[3] == 'M') && (tclass[4] == 'B')) ? 4 :
+                 ((tclass[3] == 'W') && (tclass[4] == 'I')) ? 5 : 0;
+
+
+                i++;
+                tjvs = text[i];
+
+//printf    ("%c\n", tjvs);   // J für Jahreszeugnis   S für Semesterzeugnis  V für Vorläufiges Zeugnis
+            if (tjvs  == 'V') {tjvs = text[i + 13]; }   // Vorläufiges Semesterzeugnis bzw. Vorläufiges Jahreszeugnis
+// das e    s vorläufig ist, macht nichts aus...
+//#### s    icherlich noch nicht die beste Lösung!
+
+            auswerten = FALSE;
+
+            // summer:
+
+printf("    c");
+
+                if (summer == TRUE)
+                {
+                    if (tjvs == 'J') auswerten = TRUE;
+
+                if ((tjvs == 'S') && (text[i + 1] == 'e'))  // Semesteryeugnis!
+                {
+                    if (text[i - 3] == 'S') auswerten = TRUE;  // sommersemesterzeugnis!
+                    if ((tclass[0] == '2') && (tclass[2] == 'B')) auswerten = TRUE;  // Abendschule Sommer
+                    if ((tclass[0] == '4') && (tclass[2] == 'B')) auswerten = TRUE;  // Abendschule Sommer
+                    if ((tclass[0] == '6') && (tclass[2] == 'B')) auswerten = TRUE;  // Abendschule Sommer
+                    if ((tclass[0] == '8') && (tclass[2] == 'B')) auswerten = TRUE;  // Abendschule Sommer
+                    }
+
+                }
+                else
+                {
+                    if ((tjvs == 'S') && (text[i + 1] == 'c')) auswerten = TRUE; // Schulnachricht
+
+                    if ((tjvs == 'S') && (text[i + 1] == 'e'))  // Semesteryeugnis!
+                    {
+                    if (text[i - 3] == 'W') auswerten = TRUE;  // sommersemesteryeugnis!
+                    if ((tclass[0] == '1') && (tclass[2] == 'B')) auswerten = TRUE;  // Abendschule Sommer
+                    if ((tclass[0] == '3') && (tclass[2] == 'B')) auswerten = TRUE;  // Abendschule Sommer
+                    if ((tclass[0] == '5') && (tclass[2] == 'B')) auswerten = TRUE;  // Abendschule Sommer
+                    if ((tclass[0] == '7') && (tclass[2] == 'B')) auswerten = TRUE;  // Abendschule Sommer
+
+                    }
+
+
             }
 
-        }
-        else
-        {
-            if ((tjvs == 'S') && (text[i + 1] == 'c')) auswerten = TRUE; // Schulnachricht
+printf("    d");
 
-            if ((tjvs == 'S') && (text[i + 1] == 'e'))  // Semesteryeugnis!
+
+            while (text[i] != ',') // Schulnachricht bzw. Zeugnis
             {
-                if (text[i - 3] == 'W') auswerten = TRUE;  // sommersemesteryeugnis!
-                if ((tclass[0] == '1') && (tclass[2] == 'B')) auswerten = TRUE;  // Abendschule Sommer
-                if ((tclass[0] == '3') && (tclass[2] == 'B')) auswerten = TRUE;  // Abendschule Sommer
-                if ((tclass[0] == '5') && (tclass[2] == 'B')) auswerten = TRUE;  // Abendschule Sommer
-                if ((tclass[0] == '7') && (tclass[2] == 'B')) auswerten = TRUE;  // Abendschule Sommer
+                i++;
+            }
+            i++;
+
+
+            while (text[i] != ',') // Ausstellungsdatum
+            {
+                i++;
+            }
+            i++;
+
+printf("    e");
+
+
+            j = 0;
+            while (text[i] != ',')
+            {
+                tname[j] = text[i];
+                j++;
+                i++;
+            }
+            tname[j] = '\0';
+            i++;
+
+            j = 0;
+            while (text[i] != ',')
+            {
+                tvorname[j] = text[i];
+                j++;
+                i++;
+            }
+            tvorname[j] = '\0';
+            i++;
+
+            j = 0;
+            while (text[i] != ',')
+            {
+                tsub[j] = text[i];
+                j++;
+                i++;
+            }
+            tsub[j] = '\0';
+            i++;
+
+            j = 0;
+            while (text[i] != ',')
+            {
+                tval[j] = text[i];
+                j++;
+                i++;
+            }
+            tval[j] = '\0';
+            i++;
+
+            if (j == 0)
+            {
+                if (text[0] == 'A')
+                {
+                    fprintf(fehl, "RDP/AP, %s", text);
+                }
+                else
+                {
+                    fprintf(fehl, "NOTE fehlet, %s", text);
+                }
+
+                tval[0] = '0';
+            }
+            else if (tval[0] == '5')
+            {
+                if (text[0] == 'A')
+                {
+                    fprintf(fehl, "RDP/AP 5er!, %s", text);
+                }
 
             }
 
-
-        }
-
-
-
-        while (text[i] != ',') // Schulnachricht bzw. Zeugnis
-        {
-            i++;
-        }
-        i++;
-
-
-        while (text[i] != ',') // Ausstellungsdatum
-        {
-            i++;
-        }
-        i++;
-
-        j = 0;
-        while (text[i] != ',')
-        {
-            tname[j] = text[i];
-            j++;
-            i++;
-        }
-        tname[j] = '\0';
-        i++;
-
-        j = 0;
-        while (text[i] != ',')
-        {
-            tvorname[j] = text[i];
-            j++;
-            i++;
-        }
-        tvorname[j] = '\0';
-        i++;
-
-        j = 0;
-        while (text[i] != ',')
-        {
-            tsub[j] = text[i];
-            j++;
-            i++;
-        }
-        tsub[j] = '\0';
-        i++;
-
-        j = 0;
-        while (text[i] != ',')
-        {
-            tval[j] = text[i];
-            j++;
-            i++;
-        }
-        tval[j] = '\0';
-        i++;
-
-        if (j == 0)
-        {
-            //if (auswerten == TRUE) fprintf(fehl, "keine Note! %s", text);
-
-            fprintf(fehl, "keine Note! %s", text);
-            printf("keine Note!  %s ", text);
-
-            tval[0] = '0';
-        }
+printf("    f");
 
 
 
-
-/* Noten umleiten seit 2020 April abgeschalten!
+/* Noten     umleiten seit 2020 April abgeschalten!
         if (!((tval[0] >= '0') && (tval[0] <= '5')))
         {
             if      ( tval[0] == 'S') {tval[0] = '1'; tval[1] = '\0';}   // Sehr zufriedenstellend
@@ -1862,89 +1942,94 @@ int auswerten;
         }
 */
 
-        j = 0;
-        while (text[i] != '\n')
-        {
-            tstundentafel[j] = text[i];
-            j++;
+printf("g");
+
+
+            j = 0;
+            while (text[i] != '\n')
+            {
+                tstundentafel[j] = text[i];
+                j++;
+                i++;
+            }
+            tstundentafel[j] = '\0';
             i++;
-        }
-        tstundentafel[j] = '\0';
-        i++;
+
+printf("h");
 
 
 //        printf("%s",text);
 //        printf("%s %s %s %s\n",tname, tvorname, tsub, tval);
 
-        if (strcmp(tclass,"4BHELS") == 0) ZweiKlassen4System = 1;
-        if (strcmp(tclass,"5BHELS") == 0) ZweiKlassen5System = 1;
+            if (strcmp(tclass,"4BHELS") == 0) ZweiKlassen4System = 1;
+            if (strcmp(tclass,"5BHELS") == 0) ZweiKlassen5System = 1;
 
 
 
-        if ((strcmp(lastName,tname) != 0) || (strcmp(lastVorName,tvorname) != 0))
-        {
+            if ((strcmp(lastName,tname) != 0) || (strcmp(lastVorName,tvorname) != 0))
+            {
 
-            //printf("%s\n", tname);
-            sprintf(lastName,"%s",tname);
-            sprintf(lastVorName,"%s",tvorname);
-            if (auswerten == TRUE) fprintf(t,"\n");
+                //printf("%s\n", tname);
+                sprintf(lastName,"%s",tname);
+                sprintf(lastVorName,"%s",tvorname);
+                if (auswerten == TRUE) fprintf(t,"\n");
 
-            jg = ojg;
-            hf = ohf;
-            ab = oab;
+                jg = ojg;
+                hf = ohf;
+                ab = oab;
 
-            if ((jg <= 5)  && (tclass[2] != 'B'))
+                if ((jg <= 5)  && (tclass[2] != 'B'))
             // statistik interessiert nur für Klassen 1 bis 5 - nicht eine AP_ Klasse, oder eine BRP Klasse usw.
             // auch Abendschule wird hier ausgesiebt
-            {
-                sum[jg][hf][ab][0] += not[0]; not [0] = 0;
-                sum[jg][hf][ab][1] += not[1]; not [1] = 0;
-                sum[jg][hf][ab][2] += not[2]; not [2] = 0;
-                sum[jg][hf][ab][3] += not[3]; not [3] = 0;
-                sum[jg][hf][ab][4] += not[4]; not [4] = 0;
-                sum[jg][hf][ab][5] += not[5]; not [5] = 0;
-
-                sch[jg][hf][ab]++;
-            }
-
-            jg = hf = ab = no = n = 0;
-
-
-            if ((strncmp(tclass,"4AHELS", 6) == 0)  ||
-                (strncmp(tclass,"4BHELS", 6) == 0)  ||
-                (strncmp(tclass,"5AHELS", 6) == 0)  ||
-                (strncmp(tclass,"5BHELS", 6) == 0)      )
-            {
-                if (strncmp(tstundentafel,"8628_01", 7) == 0)
                 {
-                    tclass[6] = 'E';
-                }
-                else
-                {
-                    tclass[6] = 'W';
+                    sum[jg][hf][ab][0] += not[0]; not [0] = 0;
+                    sum[jg][hf][ab][1] += not[1]; not [1] = 0;
+                    sum[jg][hf][ab][2] += not[2]; not [2] = 0;
+                    sum[jg][hf][ab][3] += not[3]; not [3] = 0;
+                    sum[jg][hf][ab][4] += not[4]; not [4] = 0;
+                    sum[jg][hf][ab][5] += not[5]; not [5] = 0;
+
+                    sch[jg][hf][ab]++;
                 }
 
-                if (strncmp(tstundentafel,"8728_01", 7) == 0)
+                jg = hf = ab = no = n = 0;
+
+
+                if ((strncmp(tclass,"4AHELS", 6) == 0)  ||
+                    (strncmp(tclass,"4BHELS", 6) == 0)  ||
+                    (strncmp(tclass,"5AHELS", 6) == 0)  ||
+                    (strncmp(tclass,"5BHELS", 6) == 0)      )
                 {
-                    tclass[6] = 'E';
-                }
-                else
-                {
-                    tclass[6] = 'W';
-                }
+                    if (strncmp(tstundentafel,"8628_01", 7) == 0)
+                    {
+                        tclass[6] = 'E';
+                    }
+                    else
+                    {
+                        tclass[6] = 'W';
+                    }
+
+                    if (strncmp(tstundentafel,"8728_01", 7) == 0)
+                    {
+                        tclass[6] = 'E';
+                    }
+                    else
+                    {
+                        tclass[6] = 'W';
+                    }
 
                 // #### mit dem neuen Schwerpunkten kommt es hier zu neuen Nummern!  erstmals 2024 / 2025 im Semester!
 
 
-            }
+                }
 /*
-if (strncmp(tclass,"1OHEL",5) == 0)
+if (strn    cmp(tclass,"1OHEL",5) == 0)
 {
-    if (strncmp(tname,"Furmanov", 8) == 0)
+    if (    strncmp(tname,"Furmanov", 8) == 0)
     {
-        printf("#\n");
+            printf("#\n");
 
-        if (auswerten == TRUE) printf("%-10s,%c,", tclass,tjvs /*stundentafel* /);  // Klassen auf 10 Zeichen mit Blanks auffüllen
+            if (auswerten == TRUE) printf("%-10s,%c,", tclass,tjvs / *stundentafel* /);  // Klassen auf 10 Zeichen mit Blanks auffüllen
         if (auswerten == TRUE) printf("%s,%s,",tname,tvorname);
         if (auswerten == TRUE) printf("%s,%s,",tsub,tval);
 
@@ -1954,32 +2039,34 @@ if (strncmp(tclass,"1OHEL",5) == 0)
 }
 */
 
-            if (auswerten == TRUE) fprintf(t, "%-10s,%c,", tclass,tjvs /*stundentafel*/);  // Klassen auf 10 Zeichen mit Blanks auffüllen
-            if (auswerten == TRUE) fprintf(t,"%s,%s,",tname,tvorname);
-            if (auswerten == TRUE) fprintf(t,"%s,%s,",tsub,tval);
 
-        }
-        else
-        {
+                if (auswerten == TRUE) fprintf(t, "%-10s,%c,", tclass,tjvs /*stundentafel*/);  // Klassen auf 10 Zeichen mit Blanks auffüllen
+                if (auswerten == TRUE) fprintf(t,"%s,%s,",tname,tvorname);
+                if (auswerten == TRUE) fprintf(t,"%s,%s,",tsub,tval);
 
-            if (auswerten == TRUE) fprintf(t,"%s,%s,",tsub,tval);
+            }
+            else
+            {
 
-            n =  (tval[0] == '0') ? 0 :   // 0 .... keine Note eingegeben!
-                 (tval[0] == '1') ? 1 :
-                 (tval[0] == '2') ? 2 :
-                 (tval[0] == '3') ? 3 :
-                 (tval[0] == '4') ? 4 :
-                 (tval[0] == '5') ? 5 : 0;
+                if (auswerten == TRUE) fprintf(t,"%s,%s,",tsub,tval);
 
-            not[n]++;
+                n =  (tval[0] == '0') ? 0 :   // 0 .... keine Note eingegeben!
+                     (tval[0] == '1') ? 1 :
+                     (tval[0] == '2') ? 2 :
+                     (tval[0] == '3') ? 3 :
+                     (tval[0] == '4') ? 4 :
+                     (tval[0] == '5') ? 5 : 0;
 
+                    not[n]++;
+
+            }
         }
 
     } while (!feof(l));
 
-// frage: braucht das wer?
+// frage    : braucht das wer?
 
-    if (auswerten == TRUE) fprintf(a,"Abt, Klassse, Anzahl, n/s, 1, 2, 3, 4, 5, G, Sum, pro Kopf 1, 2, 3, 4, 5, G, Prozent, 1, 2, 3, 4, 5, G\n");
+    if (    auswerten == TRUE) fprintf(a,"Abt, Klassse, Anzahl, n/s, 1, 2, 3, 4, 5, G, Sum, pro Kopf 1, 2, 3, 4, 5, G, Prozent, 1, 2, 3, 4, 5, G\n");
 
     n = sum[1][1][1][1] + sum[1][1][1][2] + sum[1][1][1][3] + sum[1][1][1][4] + sum[1][1][1][5] + sum[1][1][1][0]; if (auswerten == TRUE) fprintf(a,"EL, 1AFELC, %2d, %.2f,  %3d, %2d, %2d, %2d, %2d, %2d, %3d, %.2f, %.2f, %.2f, %.2f, %.2f, %.2f,, %.2f, %.2f, %.2f, %.2f, %.2f, %.2f\n", sch[1][1][1], (float)n/sch[1][1][1],sum[1][1][1][1],sum[1][1][1][2],sum[1][1][1][3],sum[1][1][1][4],sum[1][1][1][5],sum[1][1][1][0], n, (float)sum[1][1][1][1]/sch[1][1][1],(float)sum[1][1][1][2]/sch[1][1][1],(float)sum[1][1][1][3]/sch[1][1][1],(float)sum[1][1][1][4]/sch[1][1][1],(float)sum[1][1][1][5]/sch[1][1][1],(float)sum[1][1][1][0]/sch[1][1][1], 100.*sum[1][1][1][1]/n,100.*sum[1][1][1][2]/n,100.*sum[1][1][1][3]/n,100.*sum[1][1][1][4]/n,100.*sum[1][1][1][5]/n,100.*sum[1][1][1][0]/n);
     n = sum[2][1][1][1] + sum[1][1][1][2] + sum[1][1][1][3] + sum[1][1][1][4] + sum[1][1][1][5] + sum[1][1][1][0]; if (auswerten == TRUE) fprintf(a,"EL, 2AFELC, %2d, %.2f,  %3d, %2d, %2d, %2d, %2d, %2d, %3d, %.2f, %.2f, %.2f, %.2f, %.2f, %.2f,, %.2f, %.2f, %.2f, %.2f, %.2f, %.2f\n", sch[2][1][1], (float)n/sch[2][1][1],sum[2][1][1][1],sum[2][1][1][2],sum[2][1][1][3],sum[2][1][1][4],sum[2][1][1][5],sum[2][1][1][0], n, (float)sum[2][1][1][1]/sch[2][1][1],(float)sum[2][1][1][2]/sch[2][1][1],(float)sum[2][1][1][3]/sch[2][1][1],(float)sum[2][1][1][4]/sch[2][1][1],(float)sum[2][1][1][5]/sch[2][1][1],(float)sum[2][1][1][0]/sch[2][1][1], 100.*sum[2][1][1][1]/n,100.*sum[2][1][1][2]/n,100.*sum[2][1][1][3]/n,100.*sum[2][1][1][4]/n,100.*sum[2][1][1][5]/n,100.*sum[2][1][1][0]/n);
@@ -2583,7 +2670,7 @@ long j, s, m, d;
 int sort(char tab[][SMAX], int n)
 //*****************************************************************************
 {
-int k, l;
+int k, l, i, j;
 char text[SMAX];
 
     // sort tab:
@@ -2595,8 +2682,16 @@ char text[SMAX];
             if (strcmp((const char *)(tab + k),
                        (const char *)(tab + l)) > 0)  // tab + 1 adds SMAX-Bytes !!!
             {
-                sprintf(text,"%s",(char *)(tab + k));
-                sprintf((char*)(tab + k),"%s",(char*)(tab + l));
+                //sprintf(text,"%s",(char *)(tab + k));
+                j = strlen((char *)(tab + k));
+                for (i = 0; i < j; i++) text[i] = ((char *)(tab + k))[i];
+                text[i] = '\0';
+
+                //sprintf((char*)(tab + k),"%s",(char*)(tab + l));
+                j = strlen((char*)(tab + l));
+                for (i = 0; i < j; i++) ((char*)(tab + k))[i] = ((char*)(tab + l))[i];
+                ((char*)(tab + k))[i] = '\0';
+
                 sprintf((char*)(tab + l),"%s",text);
 
             }
@@ -2613,13 +2708,16 @@ int delEQ(char tab[][SMAX], int n, int x)  // x: wieviele Stellen m�ssen gleic
 // RETURN: the new (reduced) length of the table
 //*****************************************************************************
 {
-    int k, m;
+    int k, m, i, j;
     m = 0;
 
     // note:  tab + 1 jumps SMAX bytes!   (char*)(tab) + 1 jumps only one !!!
     for (k = 0; m < n; k++)
     {
-        sprintf((char*)(tab) + ((k * SMAX)),"%s",(char*)(tab) + ((m*SMAX)));
+        //sprintf((char*)(tab) + ((k * SMAX)),"%s",(char*)(tab) + ((m*SMAX)));
+        j = strlen((char*)(tab) + ((m*SMAX)));
+        for(i = 0; i < j; i++) ((char*)(tab) + ((k * SMAX)))[i] = ((char*)(tab) + ((m*SMAX)))[i];
+        ((char*)(tab) + ((k * SMAX)))[i] = '\0';
 
         while ((m < n) &&
                 (strncmp((const char *)(tab) + ((k*SMAX)),
@@ -2634,7 +2732,7 @@ int delEQ(char tab[][SMAX], int n, int x)  // x: wieviele Stellen m�ssen gleic
 
 int getAllSubsOfThisClass(int j, int i, char(*t)[SMAX], char (*subs)[30])
 {
-    int q, r, x;
+    int q, r, x,k,o;
     char newSubName[30];
     char secSubName[30];
     int verhInList = -1;
@@ -2716,7 +2814,12 @@ int getAllSubsOfThisClass(int j, int i, char(*t)[SMAX], char (*subs)[30])
     if (verhInList >= 0)
     {
         sprintf(secSubName,"%s", subs[0]);
-        sprintf(subs[0],"%s", subs[verhInList]);
+
+        //sprintf(subs[0],"%s", subs[verhInList]);
+        o = strlen(subs[verhInList]);
+        for (k = 0; k < o; k++) (subs[0])[k] = (subs[verhInList])[k];
+        (subs[0])[k] = '\0';
+
         sprintf(subs[verhInList], "%s",secSubName);
         m = 1;
     }
@@ -2728,7 +2831,12 @@ int getAllSubsOfThisClass(int j, int i, char(*t)[SMAX], char (*subs)[30])
             if (strcmp(subs[m], subs[n]) > 0)
             {
                 sprintf(secSubName,"%s", subs[m]);
-                sprintf(subs[m],"%s", subs[n]);
+
+                //sprintf(subs[m],"%s", subs[n]);
+                o= strlen(subs[n]);
+                for (k = 0; k < o; k++) (subs[m])[k] = (subs[n])[k];
+                (subs[m])[k] = '\0';
+
                 sprintf(subs[n], "%s",secSubName);
 
             }
@@ -2841,51 +2949,54 @@ char subNames[][11] = {
 "ORC5",
 };
 
+
 //                        1  2  3  4  5  6  7  8  9  0  1  2  3  4  5  6  7  8  9
 //                        1  1  2  2  3  3  4  4  4  4  5  5  5  5  1  2  3  4  4
 //                        A  B  A  B  A  B  A  B  A  B  A  B  A  B  A  A  A  A  A
 //                        H  H  H  H  H  H  H  H  H  H  H  H  H  H  F  F  F  F  F
 //                                          E  E  W  W  E  E  W  W           W  S
 
-char subWeight[][19] = {
-/*verh  */             {  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-/*RK    */             {  2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2 },
-/*REL   */             {  2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2 },
-/*ETH   */             {  2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2 },
-/*R     */             {  2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2 },
-/*D     */             {  3, 3, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 0, 0, 0, 0, 0 },
-/*E1    */             {  2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 0, 0, 0, 0, 0 },
-/*E2    */             {  0, 0, 0, 0, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 0, 0, 0, 0, 0 },
-/*GGP   */             {  2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-/*WIR3  */             {  0, 0, 0, 0, 0, 0, 3, 3, 3, 3, 2, 2, 2, 2, 0, 0, 0, 0, 0 },
-/*WIR   */             {  0, 0, 0, 0, 0, 0, 3, 3, 3, 3, 2, 2, 2, 2, 0, 0, 0, 0, 0 },
-/*BESP  */             {  2, 2, 2, 2, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0 },
-/*AM    */             {  4, 4, 4, 4, 3, 3, 2, 2, 2, 2, 2, 2, 2, 2, 0, 0, 0, 0, 0 },
-/*NW2   */             {  3, 3, 3, 3, 2, 2, 2, 2, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-/*SOPK  */             {  1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-/*HWE1  */             {  6, 6, 5, 5, 3, 3, 2, 2, 2, 2, 3, 3, 3, 3, 0, 0, 0, 0, 0 },
-/*MTRS  */             {  0, 0, 2, 2, 2, 2, 2, 2, 3, 3, 2, 2, 4, 4, 0, 0, 0, 0, 0 },
-/*DIC1  */             {  0, 0, 1, 1, 2, 2, 4, 4, 4, 4, 4, 4, 5, 5, 0, 0, 0, 0, 0 },
-/*KSN1  */             {  0, 0, 0, 0, 2, 2, 3, 3, 2, 2, 4, 4, 6, 6, 0, 0, 0, 0, 0 },
-/*FSST  */             {  3, 3, 3, 3, 3, 3, 4, 4, 2, 2, 5, 5, 2, 2, 0, 0, 0, 0, 0 },
-/*LA1   */             {  0, 0, 0, 0, 3, 3, 4, 4, 4, 4, 8, 8, 8, 8, 0, 0, 0, 0, 0 },
-/*PBE3  */             {  0, 0, 0, 0, 4, 4, 4, 4, 4, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-/*PBE4  */             {  7, 7, 7, 7, 4, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-/*PBE   */             {  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-/*BTP   */             {  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-/*DUK   */             {  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 3, 2, 2, 2 },/* ?? */
-/*NWG   */             {  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-/*UNF   */             {  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-/*ELWP  */             {  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-/*ELDE  */             {  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-/*AELT  */             {  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-/*NWWP  */             {  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-/*KMEL  */             {  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-/*SOTE  */             {  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-/*COIT  */             {  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-/*CTNT  */             {  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-/*ORC5  */             {  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-};
+//char XXXsubWeight[][19] = {
+/*
+/ *verh  * /             {  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+/ *RK    * /             {  2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2 },
+/ *REL   * /             {  2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2 },
+/ *ETH   * /             {  2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2 },
+/ *R     * /             {  2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2 },
+/ *D     * /             {  3, 3, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 0, 0, 0, 0, 0 },
+/ *E1    * /             {  2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 0, 0, 0, 0, 0 },
+/ *E2    * /             {  0, 0, 0, 0, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 0, 0, 0, 0, 0 },
+/ *GGP   * /             {  2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+/ *WIR3  * /             {  0, 0, 0, 0, 0, 0, 3, 3, 3, 3, 2, 2, 2, 2, 0, 0, 0, 0, 0 },
+/ *WIR   * /             {  0, 0, 0, 0, 0, 0, 3, 3, 3, 3, 2, 2, 2, 2, 0, 0, 0, 0, 0 },
+/ *BESP  * /             {  2, 2, 2, 2, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0 },
+/ *AM    * /             {  4, 4, 4, 4, 3, 3, 2, 2, 2, 2, 2, 2, 2, 2, 0, 0, 0, 0, 0 },
+/ *NW2   * /             {  3, 3, 3, 3, 2, 2, 2, 2, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+/ *SOPK  * /             {  1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+/ *HWE1  * /             {  6, 6, 5, 5, 3, 3, 2, 2, 2, 2, 3, 3, 3, 3, 0, 0, 0, 0, 0 },
+/ *MTRS  * /             {  0, 0, 2, 2, 2, 2, 2, 2, 3, 3, 2, 2, 4, 4, 0, 0, 0, 0, 0 },
+/ *DIC1  * /             {  0, 0, 1, 1, 2, 2, 4, 4, 4, 4, 4, 4, 5, 5, 0, 0, 0, 0, 0 },
+/ *KSN1  * /             {  0, 0, 0, 0, 2, 2, 3, 3, 2, 2, 4, 4, 6, 6, 0, 0, 0, 0, 0 },
+/ *FSST  * /             {  3, 3, 3, 3, 3, 3, 4, 4, 2, 2, 5, 5, 2, 2, 0, 0, 0, 0, 0 },
+/ *LA1   * /             {  0, 0, 0, 0, 3, 3, 4, 4, 4, 4, 8, 8, 8, 8, 0, 0, 0, 0, 0 },
+/ *PBE3  * /             {  0, 0, 0, 0, 4, 4, 4, 4, 4, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+/ *PBE4  * /             {  7, 7, 7, 7, 4, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+/ *PBE   * /             {  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+/ *BTP   * /             {  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+/ *DUK   * /             {  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 3, 2, 2, 2 },/ * ?? * /
+/ *NWG   * /             {  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+/ *UNF   * /             {  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+/ *ELWP  * /             {  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+/ *ELDE  * /             {  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+/ *AELT  * /             {  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+/ *NWWP  * /             {  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+/ *KMEL  * /             {  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+/ *SOTE  * /             {  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+/ *COIT  * /             {  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+/ *CTNT  * /             {  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+/ *ORC5  * /             {  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+} ;
+*/
 
 
 int getSubId(char * sub)
@@ -2917,9 +3028,9 @@ int getClassId(char * className, int summer)
 int ret = -1;
 
 // der Unterschied sommer oder winter ist im Grunde nur für die 4AFELC von Bedeutung!
-//#####
-
 // Frage: wo kommen die E und W her?
+// ?
+
 
     if      (strncmp(className,"1AFELC_S",  8) == 0) ret = 0;
     else if (strncmp(className,"1AFELC_J",  8) == 0) ret = 1;
@@ -2994,6 +3105,136 @@ int ret = -1;
 
 // hier fehlt noch die Info Embedded odere Wireless!
 // und die B Klassen
+// ?
+
+
+    if ((dir[3] == '2') && (dir[4] == '4'))   // 2024
+    {
+         if (strncmp(className,"1AHELS_S",  8) == 0) ret = 22;
+    else if (strncmp(className,"1AHELS_J",  8) == 0) ret = 22;
+    else if (strncmp(className,"1BHELS_S",  8) == 0) ret = 22;
+    else if (strncmp(className,"1BHELS_J",  8) == 0) ret = 22;
+    else if (strncmp(className,"1CHELS_S",  8) == 0) ret = 22;
+    else if (strncmp(className,"1CHELS_J",  8) == 0) ret = 22;
+    }
+
+    else if ((dir[3] == '2') && (dir[4] == '5'))   // 2025
+    {
+         if (strncmp(className,"1AHELS_S",  8) == 0) ret = 22;
+    else if (strncmp(className,"1AHELS_J",  8) == 0) ret = 22;
+    else if (strncmp(className,"1BHELS_S",  8) == 0) ret = 22;
+    else if (strncmp(className,"1BHELS_J",  8) == 0) ret = 22;
+    else if (strncmp(className,"1CHELS_S",  8) == 0) ret = 22;
+    else {if (strncmp(className,"1CHELS_J",  8) == 0) ret = 22;}
+
+         if (strncmp(className,"2AHELS_S",  8) == 0) ret = 23;
+    else if (strncmp(className,"2AHELS_J",  8) == 0) ret = 23;
+    else if (strncmp(className,"2BHELS_S",  8) == 0) ret = 23;
+    else if (strncmp(className,"2BHELS_J",  8) == 0) ret = 23;
+    else if (strncmp(className,"2CHELS_S",  8) == 0) ret = 23;
+    else if (strncmp(className,"2CHELS_J",  8) == 0) ret = 23;
+
+    }
+
+    else if ((dir[3] == '2') && (dir[4] == '6'))   // 2026
+    {
+         if (strncmp(className,"1AHELS_S",  8) == 0) ret = 22;
+    else if (strncmp(className,"1AHELS_J",  8) == 0) ret = 22;
+    else if (strncmp(className,"1BHELS_S",  8) == 0) ret = 22;
+    else if (strncmp(className,"1BHELS_J",  8) == 0) ret = 22;
+    else if (strncmp(className,"1CHELS_S",  8) == 0) ret = 22;
+    else {if (strncmp(className,"1CHELS_J",  8) == 0) ret = 22;}
+
+         if (strncmp(className,"2AHELS_S",  8) == 0) ret = 23;
+    else if (strncmp(className,"2AHELS_J",  8) == 0) ret = 23;
+    else if (strncmp(className,"2BHELS_S",  8) == 0) ret = 23;
+    else if (strncmp(className,"2BHELS_J",  8) == 0) ret = 23;
+    else if (strncmp(className,"2CHELS_S",  8) == 0) ret = 23;
+    else {if (strncmp(className,"2CHELS_J",  8) == 0) ret = 23;}
+
+         if (strncmp(className,"3AHELS_S",  8) == 0) ret = 24;
+    else if (strncmp(className,"3AHELS_J",  8) == 0) ret = 24;
+    else if (strncmp(className,"3BHELS_S",  8) == 0) ret = 24;
+    else if (strncmp(className,"3BHELS_J",  8) == 0) ret = 24;
+    else if (strncmp(className,"3CHELS_S",  8) == 0) ret = 24;
+    else {if (strncmp(className,"3CHELS_J",  8) == 0) ret = 24;}
+
+
+    }
+
+    else if ((dir[3] == '2') && (dir[4] == '7'))   // 2027
+    {
+         if (strncmp(className,"1AHELS_S",  8) == 0) ret = 22;
+    else if (strncmp(className,"1AHELS_J",  8) == 0) ret = 22;
+    else if (strncmp(className,"1BHELS_S",  8) == 0) ret = 22;
+    else if (strncmp(className,"1BHELS_J",  8) == 0) ret = 22;
+    else if (strncmp(className,"1CHELS_S",  8) == 0) ret = 22;
+    else {if (strncmp(className,"1CHELS_J",  8) == 0) ret = 22;}
+
+         if (strncmp(className,"2AHELS_S",  8) == 0) ret = 23;
+    else if (strncmp(className,"2AHELS_J",  8) == 0) ret = 23;
+    else if (strncmp(className,"2BHELS_S",  8) == 0) ret = 23;
+    else if (strncmp(className,"2BHELS_J",  8) == 0) ret = 23;
+    else if (strncmp(className,"2CHELS_S",  8) == 0) ret = 23;
+    else {if (strncmp(className,"2CHELS_J",  8) == 0) ret = 23;}
+
+         if (strncmp(className,"3AHELS_S",  8) == 0) ret = 24;
+    else if (strncmp(className,"3AHELS_J",  8) == 0) ret = 24;
+    else if (strncmp(className,"3BHELS_S",  8) == 0) ret = 24;
+    else if (strncmp(className,"3BHELS_J",  8) == 0) ret = 24;
+    else if (strncmp(className,"3CHELS_S",  8) == 0) ret = 24;
+    else {if (strncmp(className,"3CHELS_J",  8) == 0) ret = 24;}
+
+         if (strncmp(className,"4AHELS_S",  8) == 0) ret = 25;
+    else if (strncmp(className,"4AHELS_J",  8) == 0) ret = 25;
+    else if (strncmp(className,"4BHELS_S",  8) == 0) ret = 25;
+    else if (strncmp(className,"4BHELS_J",  8) == 0) ret = 25;
+    else if (strncmp(className,"4CHELS_S",  8) == 0) ret = 25;
+    else {if (strncmp(className,"4CHELS_J",  8) == 0) ret = 25;}
+
+    }
+
+    else if ((dir[3] == '2') && (dir[4] == '8'))   // 2028
+    {
+         if (strncmp(className,"1AHELS_S",  8) == 0) ret = 22;
+    else if (strncmp(className,"1AHELS_J",  8) == 0) ret = 22;
+    else if (strncmp(className,"1BHELS_S",  8) == 0) ret = 22;
+    else if (strncmp(className,"1BHELS_J",  8) == 0) ret = 22;
+    else if (strncmp(className,"1CHELS_S",  8) == 0) ret = 22;
+    else {if (strncmp(className,"1CHELS_J",  8) == 0) ret = 22;}
+
+         if (strncmp(className,"2AHELS_S",  8) == 0) ret = 23;
+    else if (strncmp(className,"2AHELS_J",  8) == 0) ret = 23;
+    else if (strncmp(className,"2BHELS_S",  8) == 0) ret = 23;
+    else if (strncmp(className,"2BHELS_J",  8) == 0) ret = 23;
+    else if (strncmp(className,"2CHELS_S",  8) == 0) ret = 23;
+    else {if (strncmp(className,"2CHELS_J",  8) == 0) ret = 23;}
+
+         if (strncmp(className,"3AHELS_S",  8) == 0) ret = 24;
+    else if (strncmp(className,"3AHELS_J",  8) == 0) ret = 24;
+    else if (strncmp(className,"3BHELS_S",  8) == 0) ret = 24;
+    else if (strncmp(className,"3BHELS_J",  8) == 0) ret = 24;
+    else if (strncmp(className,"3CHELS_S",  8) == 0) ret = 24;
+    else {if (strncmp(className,"3CHELS_J",  8) == 0) ret = 24;}
+
+         if (strncmp(className,"4AHELS_S",  8) == 0) ret = 25;
+    else if (strncmp(className,"4AHELS_J",  8) == 0) ret = 25;
+    else if (strncmp(className,"4BHELS_S",  8) == 0) ret = 25;
+    else if (strncmp(className,"4BHELS_J",  8) == 0) ret = 25;
+    else if (strncmp(className,"4CHELS_S",  8) == 0) ret = 25;
+    else {if (strncmp(className,"4CHELS_J",  8) == 0) ret = 25;}
+
+         if (strncmp(className,"5AHELS_S",  8) == 0) ret = 26;
+    else if (strncmp(className,"5AHELS_J",  8) == 0) ret = 26;
+    else if (strncmp(className,"5BHELS_S",  8) == 0) ret = 26;
+    else if (strncmp(className,"5BHELS_J",  8) == 0) ret = 26;
+    else if (strncmp(className,"5CHELS_S",  8) == 0) ret = 26;
+    else {if (strncmp(className,"5CHELS_J",  8) == 0) ret = 26;}
+
+
+    }
+
+
 
     return ret;
 }
