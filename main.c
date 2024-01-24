@@ -29,11 +29,12 @@
 //          Kurzbezeichnung, Note, Schulformkennzahl
 //          Ausführen, das kann dauern - soll das Ergebnis angezeigt werden ja
 //          etwa 7 Minuten...
+//          ACHTUNG: Kurzbezeichnung nicht vergessen!
 // Exportieren als Liste.csv - ACHTUNG SEMIKOLOM
 // 2.)  define Jahresschluss richtigstellen,
 // 3.)  sind in der Liste , als Trenner verwendet / falls nein, aendern!!!
 // sokrates > Auswertung > Standard > 152 > FW-Datum, Gegenstand, LehrerIn, Art
-// speichern unter: home>sigma>Mah.csv
+// speichern unter: home>sigma>Mah.csv   - ACHTUNG: nur , als Trenner!!!
 //*****************************************************************************
 // next steps:
 // erweitere Linux Version
@@ -46,7 +47,7 @@
 #include "console.h"
 
 
-#define LINEMAX            8000
+#define LINEMAX            2000
 #define LEN                 200
 #define SMAX                800
 #define TRUE                  1
@@ -499,11 +500,9 @@ getch();
     writeF(&fehl, "./Fehler.csv");
     writeF(&allTab, "./allTab.csv"); // Übersicht über alle Klassen aller Abteilungen
 
-printf("hier 1!\n");
 
     list2tab(liste, tab, fehl, allTab, summer);
 
-printf("hier 2!\n");
 
     // zunächst sollen alle Daten aller Abteilungen weggespeichert werden.
 
@@ -515,7 +514,6 @@ printf("hier 2!\n");
 
     i = 0;
 
-printf("hier 3!\n");
 
 
     do   // Tab wird in tab eigelesen ... Gleichzeitig werden hier Vorgezogene Prüfungen entfernt
@@ -527,7 +525,6 @@ printf("hier 3!\n");
 
     fclose(tab);
 
-printf("hier 4!\n");
 
 
     sort(t, i); // dadurch werden Schüler mit "nur" vorläufigen Zeugnissen miteinsortiert in ihre Klassen
@@ -545,6 +542,8 @@ printf("hier 4!\n");
 
 }
     /**└────────────────────────────────────────────────┘**/
+
+
 
     /**┌────────────────────────────────────────────────┐**/
 {   /**          3          Protokolle werden erstellt   **/
@@ -580,11 +579,11 @@ EL;5;01;1AHELS_J  ;HWE1;Relota;Nicola;
 EL;N;06;1AHELS_J  ;AM;Seidl;Alex;
 */
 
-printf("$3 hier 1!\n");
 
     do   // Tab wird in tab eigelesen ... Gleichzeitig werden hier Vorgezogene Prüfungen entfernt
     {
         fgets(text, LINEMAX, tab);
+
 
         if ((text[0] >= '0') && (text[0] <= '8') &&                      // nur Klassen zwischen dem 1 und 8 Jahrgang (Abendschule)!
             ((text[2] == 'H') || (text[2] == 'F') || (text[2] == 'B')))  // nur Höhere oder Fachschule oder Abendschule - keine V (=Vorgezogene)
@@ -609,7 +608,6 @@ printf("$3 hier 1!\n");
 
     sprintf(compClass,"%c%c%c%c%c%c%c%c%c%c", t[j][0], t[j][1], t[j][2], t[j][3], t[j][4], t[j][5], t[j][6], t[j][7], t[j][8], t[j][9] );
 
-printf("$3 hier 2!\n");
 
 
     for (i = 0; i < lines; i++)    // für alle Einträge
@@ -657,7 +655,6 @@ printf("$3 hier 2!\n");
 
             // Arrays mit lauter Null-Einträgen wird vorbereitet:
 
-printf("$3 hier 3!\n");
 
 
 
@@ -715,7 +712,6 @@ printf("$3 hier 3!\n");
                 fprintf(notes,","); r++;
 
 
-printf("$3 a");
 
 
 
@@ -734,7 +730,6 @@ printf("$3 a");
 
                 s = (s / 2) + 50;  // Umlaute, Sonderezeichen...
 
-printf("$3 b");
 
 
                 while(r < s) {fprintf(notes," "); r++;} fprintf(notes,",");
@@ -760,7 +755,6 @@ printf("$3 b");
 //################################################################
 
 
-printf("$3 c");
 
 
                 gefunden = 0;
@@ -852,7 +846,6 @@ Anzahl der 5er, Monat Tag Jahr der letzten Mahnung,  Lehrer...
                           *
                           *
                           **/
-printf("$3 d");
 
                         if (qualifier[ + r + strlen(subs[k]) + 1]  == '5') subs5Anz[k]++;  // hier sind die Noten !!!
                         if (qualifier[ + r + strlen(subs[k]) + 1]  == 'N') subs5Anz[k]++;  // hier sind die Noten !!!
@@ -879,7 +872,6 @@ printf("$3 d");
 
             //fprintf(notes,"\n");
             //fprintf(notes,"\nVGL: %s",t[j]);
-printf("$3 e");
             if (n > 0)
             {
                 fprintf(notes,"|%d.%06d|\n", w / n, (w*1000000/n)%1000000);
@@ -902,7 +894,6 @@ printf("$3 e");
 //fprintf(percent,"%c%c,", t[j][3], t[j][4]); // Abteilungszugehörigkeit
 //while(t[j][r] != ',') {fprintf(percent,"%c", t[j][r]); r++;}
 
-printf("$3 f");
 
         for (k = 0; k < nSubs; k++)
         {
@@ -913,7 +904,6 @@ fprintf(percent,"%s;%d;%d; %d,%03d\n", subs[k], subs5Anz[k], subsNAnz[k], (subs5
         (subsNAnz[k] > 0) ? (1000*subs5Anz[k])/subsNAnz[k]:0);
         }
 
-printf("$3 g");
 
         if ((2 * numberOfMembersWith5N) >=   numberOfMembers)
         {
@@ -921,7 +911,6 @@ printf("$3 g");
         }
 
             fprintf(notes,"%c%c,%s,  ,         , Anzahl der 5 bzs. N je Gegenstand:   ,,,", Abt[0], Abt[1], ClassName); // ENDE DER KLASSE!!!
-printf("$3 h");
         for (k = 0; k < nSubs; k++)
         {
 
@@ -930,12 +919,10 @@ printf("$3 h");
             {
                 fprintf(notes," ");
                 l++;
-printf("l = %05d strlen %05d k = %05d %s.\n", l, (strlen(subs[k]) - 1), k, subs[k]);
             }
             fprintf(notes,",%2d,",subs5Anz[k]);
         }
         fprintf(notes,"\n");
-printf("$3 i");
             fprintf(notes,"%c%c,%s,  ,         , Anzahl der Noten dieses Fachs:       ,,,", Abt[0], Abt[1], ClassName);
 
         for (k = 0; k < nSubs; k++)
@@ -945,12 +932,11 @@ printf("$3 i");
             fprintf(notes,",%2d,",subsNAnz[k]);
         }
         fprintf(notes,"\n");
-printf("$3 j");
 
         fprintf(notes,"%c%c,%s,  ,         , in Prozent  ab 30 %% -> Begruendung!  ,,,", Abt[0], Abt[1], ClassName);
 
         for (k = 0; k < nSubs; k++) subsNAnzListe[k] = 0;
-printf("$3 k");
+
         for (k = 0; k < nSubs; k++)
         {
             l = 0;
@@ -963,8 +949,6 @@ printf("$3 k");
             }
 
         }
-
-printf("$3 l");
 
         fprintf(notes,"\n"); // ENDE DER KLASSE!!!
 
@@ -1368,9 +1352,7 @@ fclose(protWI);
 
 
     printf("Schritt 5: Oeffne Mah.txt und trage in Wiederholungsp. ein\n");
-    getch();
-    system("cls");
-
+    // ?? wozu ?? system("cls");
 
     readF(&wel, "./Wiederholungspruefungen.csv");
     readF(&mah, "./Mah.csv");
@@ -1398,13 +1380,15 @@ Klasse,Familienname,Vorname,Geburtsdatum,Gegenstand,FW-Datum,LehrerIn,FW-Art,FW-
     fclose(wel);
 
     // sortieren ... zur Kontrolle...
-
     sort(t,i);
 
     // Zeile für Zeile aus Mah lesen und in t eintragen
 
+    // printf("die Tabelle hat %d Zeilen\n", i);
+
     fgets(text, LINEMAX, mah);
-//    printf("erste Zeile --->%s", text);
+
+    // printf("erste Zeile --->%s", text);
 
     f = 0;
 
@@ -1412,34 +1396,39 @@ Klasse,Familienname,Vorname,Geburtsdatum,Gegenstand,FW-Datum,LehrerIn,FW-Art,FW-
     {
         fgets(text, LINEMAX, mah);
 //        system("cls");
-//        printf("%3d %s\n", f, text);
+// printf("%3d %s\n", f, text);
+
 
         f++;
         j = k = 0;  while (text[j] != ',') { ClassName[k] = text[j]; j++; k++; } ClassName[k] = '\0';
 
-//        printf("a) ClassName: .%s.\n", ClassName);
+        // printf("a) ClassName: .%s.\n", ClassName);
 
         j++; k = 0; while (text[j] != ',') { FamNam[k] = text[j];    j++; k++; } FamNam[k] = '\0';
+
         j++; k = 0; while (text[j] != ',') { VorNam[k] = text[j];    j++; k++; } VorNam[k] = '\0';
 
 //        printf("b) Name: .%s.  .%s.\n", FamNam, VorNam);
 
         j++;        while (text[j] != ',') {j++;} // Geb Datum wird übersprungen
 
+
         // Gegenstand einlesen und Kurzform finden.
         //######
+
         sprintf(Subject, "                                                                                                    ");
 
         j++; k = 0; while ((text[j] != ',') && ((strcmp("Geografie", Subject) != 0))) { Subject[k] = text[j]; j++; k++; } Subject[k] = '\0';
+
 
         if (strncmp("Geografie", Subject, 9) == 0)  // weil GGP ein Gegenstand ist, in dem im Namen ein Beistich vorkommt!!!
         {
             j++; while (text[j] != ',') {j++;}
         }
 
+
 //        printf("k = %d \n", k);
 //        printf("c) sub: %s\n", Subject);
-
 
 
         j++; k = 0; while (text[j] != ',') { Date[k] = text[j];      j++; k++; } Date[k] = '\0';
@@ -1447,6 +1436,7 @@ Klasse,Familienname,Vorname,Geburtsdatum,Gegenstand,FW-Datum,LehrerIn,FW-Art,FW-
 //        printf("d) Datum: !%s!\n", Date);
 
         j++; k = 0; while (text[j] != ',') { Teacher[k] = text[j];   j++; k++; } Teacher[k] = '\0';
+
 //        printf("e) teacher: .%s.\n", Teacher);
 
         n = 0;
@@ -1465,6 +1455,7 @@ Klasse,Familienname,Vorname,Geburtsdatum,Gegenstand,FW-Datum,LehrerIn,FW-Art,FW-
                 n = 1;
             }
         }
+
         if (n != 1)
         {
             printf("\nSubject not found: %s\n", Subject);
@@ -1473,7 +1464,6 @@ Klasse,Familienname,Vorname,Geburtsdatum,Gegenstand,FW-Datum,LehrerIn,FW-Art,FW-
         r = 0; while ((Sub[r] != ' ') && (Sub[r] != '\0')) { r++; } Sub[r] = '\0';
 
         // printf("---- read in tab --- \n");
-
 
         for (m = 0; m < i; m++)
         {
@@ -1493,7 +1483,8 @@ Klasse,Familienname,Vorname,Geburtsdatum,Gegenstand,FW-Datum,LehrerIn,FW-Art,FW-
             r = 0; while (t[m][s] != ',') { mahnName[r]    = t[m][s]; s++; r++; } s++; mahnName[r]    = '\0';
 
 
-            // for tests: if (m <= 10) printf("T:: %02d: .%s. Subject .%s. Name:.%s. name .%s.\n", m, mahnClass, mahnSub, mahnSurName, mahnName);
+// for tests:
+// if (m <= 100) printf("T:: %02d: .%s. Subject .%s. Name:.%s. name .%s.\n", m, mahnClass, mahnSub, mahnSurName, mahnName);
 
             if (((strncmp(mahnSurName,FamNam,strlen(FamNam))) == 0) &&
                 ((strncmp(mahnName,VorNam,strlen(VorNam))) == 0) &&
@@ -1510,13 +1501,14 @@ Klasse,Familienname,Vorname,Geburtsdatum,Gegenstand,FW-Datum,LehrerIn,FW-Art,FW-
                 t[m][32]++;
 //                printf("m: %d %s", m, t[m]);
 mCounter++;
-printf("* %s, %s\n", Teacher, NextClass); // gefunden
+
+
+
+//printf("* %s, %s\n", Teacher, NextClass); // gefunden
 
 
             }
-
         }
-
 
 //printf("hier!\n");
 //        getch();
@@ -1728,8 +1720,6 @@ int length;
 
     fgets(text, LINEMAX, l); // Klasse,Zeugnisart,Zeugnisdatum,Familienname,Vorname,Kurzbezeichnung,Note,Schulformkennzahl
 
-printf("hier sub 1!\n");
-
     jg = hf = ab = no = n = 0;
 
     do
@@ -1737,24 +1727,24 @@ printf("hier sub 1!\n");
         fgets(text, LINEMAX, l);
 
         length = strlen(text);
-        zeile++;
 
-
-printf("%06d len %06d %s", zeile, length, text);
+        zeile++;  // braucht das wer? - wo ?
 
         if (length > 0)
         {
 
             i = 0;
             j = 0;
+
             while ((text[i] != ',') /*&& (text[i] != '_')*/)   // class:  _WS  _SS abschneiden
             // für die weitere Arbeiten brauchen wir die Semesterinformation WS oder SS
             {
-            tclass[j] = text[i];
+                tclass[j] = text[i];
                 j++;
                 i++;
             }
-printf("a");
+
+
             if (tclass[0] == '1')
             {
                 tclass[j] = '_'; j++;
@@ -1762,7 +1752,6 @@ printf("a");
                                             // J Jahreszeugnis
                                             // S Schulnachricht
             }
-printf("    b");
 
             tclass[j] = '\0';
 
@@ -1771,7 +1760,7 @@ printf("    b");
             oab = ab;
 
             jg = tclass[0] - '0';
-            hf = (tclass[2] == 'H') ? 0 : 1;
+            hf = (tclass[2] == 'H') ? 1 : 0;  // stand auf 0:1 ... ?
             ab = ((tclass[3] == 'E') && (tclass[4] == 'L')) ? 1 :
                  ((tclass[3] == 'E') && (tclass[4] == 'T')) ? 2 :
                  ((tclass[3] == 'I') && (tclass[4] == 'F')) ? 3 :
@@ -1782,28 +1771,26 @@ printf("    b");
                 i++;
                 tjvs = text[i];
 
-//printf    ("%c\n", tjvs);   // J für Jahreszeugnis   S für Semesterzeugnis  V für Vorläufiges Zeugnis
+//printf("%c\n", tjvs);   // J für Jahreszeugnis   S für Semesterzeugnis  V für Vorläufiges Zeugnis
             if (tjvs  == 'V') {tjvs = text[i + 13]; }   // Vorläufiges Semesterzeugnis bzw. Vorläufiges Jahreszeugnis
-// das e    s vorläufig ist, macht nichts aus...
-//#### s    icherlich noch nicht die beste Lösung!
+// das es vorläufig ist, macht nichts aus...
+//#### sicherlich noch nicht die beste Lösung!
 
             auswerten = FALSE;
 
             // summer:
 
-printf("    c");
-
                 if (summer == TRUE)
                 {
                     if (tjvs == 'J') auswerten = TRUE;
 
-                if ((tjvs == 'S') && (text[i + 1] == 'e'))  // Semesteryeugnis!
-                {
-                    if (text[i - 3] == 'S') auswerten = TRUE;  // sommersemesterzeugnis!
-                    if ((tclass[0] == '2') && (tclass[2] == 'B')) auswerten = TRUE;  // Abendschule Sommer
-                    if ((tclass[0] == '4') && (tclass[2] == 'B')) auswerten = TRUE;  // Abendschule Sommer
-                    if ((tclass[0] == '6') && (tclass[2] == 'B')) auswerten = TRUE;  // Abendschule Sommer
-                    if ((tclass[0] == '8') && (tclass[2] == 'B')) auswerten = TRUE;  // Abendschule Sommer
+                    if ((tjvs == 'S') && (text[i + 1] == 'e'))  // Semesterzeugnis!
+                    {
+                        if (text[i - 3] == 'S') auswerten = TRUE;  // sommersemesterzeugnis!
+                        if ((tclass[0] == '2') && (tclass[2] == 'B')) auswerten = TRUE;  // Abendschule Sommer
+                        if ((tclass[0] == '4') && (tclass[2] == 'B')) auswerten = TRUE;  // Abendschule Sommer
+                        if ((tclass[0] == '6') && (tclass[2] == 'B')) auswerten = TRUE;  // Abendschule Sommer
+                        if ((tclass[0] == '8') && (tclass[2] == 'B')) auswerten = TRUE;  // Abendschule Sommer
                     }
 
                 }
@@ -1824,24 +1811,17 @@ printf("    c");
 
             }
 
-printf("    d");
-
-
             while (text[i] != ',') // Schulnachricht bzw. Zeugnis
             {
                 i++;
             }
             i++;
 
-
             while (text[i] != ',') // Ausstellungsdatum
             {
                 i++;
             }
             i++;
-
-printf("    e");
-
 
             j = 0;
             while (text[i] != ',')
@@ -1883,7 +1863,7 @@ printf("    e");
             tval[j] = '\0';
             i++;
 
-            if (j == 0)
+           if (j == 0)
             {
                 if (text[0] == 'A')
                 {
@@ -1904,9 +1884,6 @@ printf("    e");
                 }
 
             }
-
-printf("    f");
-
 
 
 /* Noten     umleiten seit 2020 April abgeschalten!
@@ -1942,7 +1919,6 @@ printf("    f");
         }
 */
 
-printf("g");
 
 
             j = 0;
@@ -1955,7 +1931,7 @@ printf("g");
             tstundentafel[j] = '\0';
             i++;
 
-printf("h");
+
 
 
 //        printf("%s",text);
