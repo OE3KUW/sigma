@@ -4,271 +4,27 @@
 //                              Σ i g m a 2 4
 //
 //
-//                                                              қuran 2024
-//*****************************************************************************
-// history:
-// 2024 01 Stundentafeln für Bionics, Wireless und Embeded systems vorbereitet
-// 2023.06 refactoring; mah Liste einbezogen
-// 2022.05 automatische Verzeichnisse für das Jahr und Monat erstellt
-// 2022.06 Abhaengig vom Monat Daten des Wintersemesters (123456) oder SS entw.
-// 2022.06 Embedded und Wireless muss noch in ein und selbe Klasse!
-// 2022.06 auch die 3AHELS braucht SigmaWerte / je nach sommer oder Winter!
-// 2022.06 erstelle Liste aller NG fuer die EL
-// 2022.11 alle ; werden durch , ersetzt, gilt für Liste.csv
-// 2022.11 die 5ten Klassen sollten auch in die sigma Liste aufgenommen werden!
-// 2022.12 resort the sigma list. nr, names ...
-// 2023.02 Prognose für EL, und Begründungen schon ab > = 30.Prozent!
-// 2023.02 1AO -> 1OHIF; 1BO -> 1PHIF ukrainische Klassen der IF zugeordnet
-// 2023.02 sigmaList.txt ebenfalls ins Dir speichern
-// 2023.02 filtere alle 5er und N heraus: Step 6!
+//                                                              қuran 2024 02
 //*****************************************************************************
 // usage:
-// 1.)
-// Sokrates > Auswertung: Dynamische Suche > Kategorie: Direktor
-//          > 404 Schüler mit Noten
-//          Kurzbezeichnung, Note, Schulformkennzahl
-//          Ausführen, das kann dauern - soll das Ergebnis angezeigt werden ja
-//          etwa 7 Minuten...
-//          ACHTUNG: Kurzbezeichnung nicht vergessen!
-// Exportieren als Liste.csv - ACHTUNG SEMIKOLOM
-// 2.)  define Jahresschluss richtigstellen,
-// 3.)  sind in der Liste , als Trenner verwendet / falls nein, aendern!!!
-// sokrates > Auswertung > Standard > 152 > FW-Datum, Gegenstand, LehrerIn, Art
-// speichern unter: home>sigma>Mah.csv   - ACHTUNG: nur , als Trenner!!!
-//*****************************************************************************
-// next steps:
-// erweitere Linux Version
-// verwende neue Stundentafeln
+// 1.) Sokrates > Auswertung: Dynamische Suche > Kategorie: Direktor > 404
+// Schüler mit Noten: Kurzbezeichnung, Note, Schulformkennzahl
+// Exportieren als Liste.csv - wichtig: Komma nicht Semicolom
+// 2.) Sokrates > Auswertung > Standard > 152 > Mahnungen
+// Gegenstand, FW-Datum, LehrerIn, Art  speichern unter: home>sigma>Mah.csv
 //*****************************************************************************
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
 #include "console.h"
-
-
-#define LINEMAX            2000
-#define LEN                 200
-#define SMAX                800
-#define TRUE                  1
-#define FALSE                 0
+#include "sigma.h"
 
 #define SELTSAME_NOTEN_AUSGEBEN
-
-    /**┌────────────────────────────────────────────────┐**/
-    /**  G l o b a l e  Variablen                        **/
-
-
-//                  0 1 2 3 4 5 6 7   8 9 0 1 2 3 4 5 6 7 8 9 0 1   2 3 4 5 6
-//                  1 1 2 2 3 3 4 4   1 1 2 2 3 3 4 4 4 4 5 5 5 5   1 2 3 4 5
-//                  F F F F F F F F   H H H H H H H H H H H H H H   H H H H H
-//                  S J W S W W W S   S J W S W S W S W S S J S J   S W W W S
-//                                                E E W W E E W W   b i o n i c s
-int weight[][27] = {
-/*AELT*/           {4,4,4,4,3,3,2,3,  0,0,0,0,0,0,0,0,0,0,0,0,0,0,  0,0,0,0,0},
-/*AM  */           {2,2,2,2,2,2,0,0,  4,4,4,4,3,3,2,2,2,2,2,2,2,2,  4,4,3,2,2},
-/*BESP*/           {2,2,2,2,2,2,1,1,  2,2,2,2,2,2,1,1,1,1,1,1,1,1,  2,2,2,1,1},
-/*COIT*/           {0,0,0,0,2,2,2,2,  0,0,0,0,0,0,0,0,0,0,0,0,0,0,  0,0,0,0,0},
-/*CTNT*/           {1,1,2,2,3,3,1,2,  0,0,0,0,0,0,0,0,0,0,0,0,0,0,  0,0,0,0,0},
-/*D   */           {0,0,0,0,0,0,0,0,  3,3,2,2,2,2,2,2,2,2,2,2,2,2,  3,2,2,2,2},
-/*DUK */           {3,3,3,3,2,2,2,2,  0,0,0,0,0,0,0,0,0,0,0,0,0,0,  0,0,0,0,0},
-/*DIC1*/           {0,0,0,0,0,0,0,0,  0,0,1,1,2,2,2,2,2,2,3,3,2,2,  0,1,2,2,3},
-/*E1  */           {2,2,2,2,2,2,0,0,  2,2,2,2,2,2,2,2,2,2,2,2,2,2,  2,2,2,2,2},
-/*E2  */           {0,0,0,0,0,0,1,2,  0,0,0,0,0,0,2,2,2,2,0,0,0,0,  0,0,1,1,1}, // jeweils 1 wertig - gleich in welchem Jahrgang
-/*ELDE*/           {2,2,2,2,2,2,1,2,  0,0,0,0,0,0,0,0,0,0,0,0,0,0,  0,0,0,0,0},
-/*ELWP*/           {5,5,5,5,4,4,2,5,  0,0,0,0,0,0,0,0,0,0,0,0,0,0,  0,0,0,0,0},
-/*FSST*/           {0,0,0,0,0,0,0,0,  3,3,3,3,3,3,4,4,2,2,5,5,2,2,  3,3,3,2,2},
-/*GGP */           {2,2,1,1,0,0,0,0,  2,2,2,2,2,2,2,2,2,2,0,0,0,0,  2,2,2,2,0},
-/*HWE1*/           {0,0,0,0,0,0,0,0,  6,6,5,5,3,3,4,4,4,4,7,7,7,7,  5,5,3,4,7}, // Projectnote zu HWE und Labor zugeschlagen
-/*KMEL*/           {0,0,2,2,3,3,1,2,  0,0,0,0,0,0,0,0,0,0,0,0,0,0,  0,0,0,0,0},
-/*KSN1*/           {0,0,0,0,0,0,0,0,  0,0,0,0,2,2,2,2,3,3,2,2,4,4,  0,0,2,2,2},
-/*LAB */           {0,0,0,0,3,3,2,4,  0,0,0,0,3,3,4,4,4,4,8,8,8,8,  0,0,3,4,8},
-/*MTRS*/           {0,0,0,0,0,0,0,0,  0,0,2,2,2,2,2,2,3,3,2,2,4,4,  0,2,2,2,3},
-/*NNWP*/           {4,4,4,4,8,8,2,4,  0,0,0,0,0,0,0,0,0,0,0,0,0,0,  0,0,0,0,0},
-/*NW2 */           {0,0,0,0,0,0,0,0,  3,3,3,3,2,2,2,2,2,2,0,0,0,0,  3,3,2,2,0},
-/*NWG */           {2,2,0,0,0,0,0,0,  0,0,0,0,0,0,0,0,0,0,0,0,0,0,  0,0,0,0,0},
-/*PBE */           {0,0,0,0,0,0,0,0,  7,7,7,7,8,8,4,4,4,4,0,0,0,0,  7,7,8,4,0},
-/*R   */           {2,2,2,2,2,2,1,2,  2,2,2,2,2,2,2,2,2,2,2,2,2,2,  2,2,2,2,2},
-/*RK  */           {2,2,2,2,2,2,1,2,  2,2,2,2,2,2,2,2,2,2,2,2,2,2,  2,2,2,2,2},
-/*REL */           {2,2,2,2,2,2,1,2,  2,2,2,2,2,2,2,2,2,2,2,2,2,2,  2,2,2,2,2},
-/*ETH */           {2,2,2,2,2,2,1,2,  2,2,2,2,2,2,2,2,2,2,2,2,2,2,  2,2,2,2,2},
-/*SOTE*/           {2,2,2,2,0,0,0,0,  0,0,0,0,0,0,0,0,0,0,0,0,0,0,  0,0,0,0,0},
-/*UNF */           {0,0,2,2,2,2,1,1,  0,0,0,0,0,0,0,0,0,0,0,0,0,0,  0,0,0,0,0},
-/*WIR3*/           {0,0,0,0,0,0,0,0,  0,0,0,0,0,0,3,3,3,3,2,2,2,2,  0,0,0,3,2},
-/*SOPK*/           {1,1,1,1,0,0,0,0,  1,1,1,1,0,0,0,0,0,0,0,0,0,0,  1,0,0,1,0},
-/*NEW */           {0,0,0,0,0,0,0,0,  0,0,0,0,0,0,0,0,0,0,0,0,0,0,  0,1,1,2,2}, // wireless
-/*NEW */           {0,0,0,0,0,0,0,0,  0,0,0,0,0,0,0,0,0,0,0,0,0,0,  0,1,1,2,2}, // bionics
-/*NEW */           {0,0,0,0,0,0,0,0,  0,0,0,0,0,0,0,0,0,0,0,0,0,0,  0,1,1,2,2}, // embedded
-/*FOEX*/           {1,1,1,1,1,1,1,1,  1,1,1,1,1,1,1,1,1,1,1,1,1,1,  1,1,1,1,1},
-/*WIRE*/           {0,0,0,0,0,0,0,0,  0,0,0,0,0,0,0,0,0,0,0,0,0,0,  0,1,1,2,2},
-/*BION*/           {0,0,0,0,0,0,0,0,  0,0,0,0,0,0,0,0,0,0,0,0,0,0,  0,1,1,2,2},
-/*EMBE*/           {0,0,0,0,0,0,0,0,  0,0,0,0,0,0,0,0,0,0,0,0,0,0,  0,1,1,2,2},
-/*ORC5*/           {1,1,1,1,1,1,1,1,  1,1,1,1,1,1,1,1,1,1,1,1,1,1,  1,1,1,1,1}  // bringt das eine Notenschnittsverbesserung ?
-};
-
- char SubNames[][LINEMAX] =
-    {
-/*AELT*/    "Englisch                                                                       ",
-/*AM  */    "Naturwissenschaftliche Grundlagen                                              ",
-/*BESP*/    "Deutsch und Kommunikation                                                      ",
-/*COIT*/    "Softwaretechnik                                                                ",
-/*CTNT*/    "Netzwerktechnik - Werkstätte und Produktionstechnik                            ",
-/*D   */    "Angewandte Mathematik                                                          ",
-/*DUK */    "Computer- und Netzwerktechnik                                                  ",
-/*DIC1*/    "Angewandte Elektronik                                                          ",
-/*E1  */    "Geografie                                                                      ",
-/*E2  */    "Elektronik - Werkstätte und Produktionstechnik                                 ",
-/*ELDE*/    "Naturwissenschaften                                                            ",
-/*ELWP*/    "Elektronik Design                                                              ",
-/*FSST*/    "Fachspezifische Softwaretechnik                                                ",
-/*GGP */    "Hardwareentwicklung                                                            ",
-/*HWE1*/    "Antriebstechnik und Mechatronik                                                ",
-/*KMEL*/    "Computerunterstützte Projektentwicklung                                        ",
-/*KSN1*/    "Angewandte Informatik                                                          ",
-/*LAB */    "Datenbanken und Informationssysteme                                            ",
-/*MTRS*/    "Programmieren und Software Engineering                                         ",
-/*NNWP*/    "Energiesysteme - Werkstätte und Produktionstechnik                             ",
-/*NW2 */    "Energiesysteme                                                                 ",
-/*NWG */    "Bewegung und Sport                                                             ",
-/*PBE */    "Betriebswirtschaft und Management                                              ",
-/*R   */    "Antriebstechnik und Mechatronik                                                ",
-/*RK  */    "Antriebstechnik und Mechatronik - Werkstätte und Produktionstechnik            ",
-/*REL */    "Automatisierungstechnik                                                        ",
-/*ETH */    "Computergestützte Projektentwicklung                                           ",
-/*SOTE*/    "Fertigungstechnik 1                                                            ",
-/*UNF */    "Konstruktion und Projektmanagement                                             ",
-/*WIR3*/    "Elektrotechnik und Automatisierungstechnik                                     ",
-/*SOPK*/    "Fertigungstechnik 1 - Werkstätte und Produktionstechnik                        ",
-/*NEW */    "Betriebstechnik                                                                ",
-/*NEW */    "Produktionstechnologie und Werkstoffe                                          ",
-/*NEW */    "Informatik und Informationssysteme                                             ",
-/*FOEX*/    "Technische Mechanik und Berechnung                                             ",
-/*WIRE*/    "Werkstätte und Produktionstechnik                                              ",
-/*BION*/    "Elektrotechnik und Elektronik                                                  ",
-/*EMBE*/    "Maschinen und Anlagen                                                          ",
-/*ORC5*/    "Wirtschaft und Recht                                                           ",
-    "Prozessmanagement                                                              ",
-    "Laboratorium                                                                   ",
-    "Anlagen- und Prüftechnik                                                       ",
-    "Netzwerksysteme und Cyber Security                                             ",
-    "Netzwerksysteme und Verteilte Systeme                                          ",
-    "Webprogrammierung und Mobile Computing                                         ",
-    "Robotik und Prozessdatenverarbeitung                                           ",
-    "Systemplanung und Projektentwicklung                                           ",
-    "Produktmanagement                                                              ",
-    "Industrieelektronik                                                            ",
-    "Digitale Systeme und Computersysteme                                           ",
-    "Messtechnik und Regelungssysteme                                               ",
-    "Kommunikationssysteme und -netze                                               ",
-    "Maschinen- und Elektrotechnik                                                  ",
-    "Prototypenbau elektronischer Systeme                                           ",
-    "Fachspezifische Informationstechnik                                            ",
-    "Technische Mechanik und Berechnung                                             ",
-    "Mechanik und Maschinenelemente                                                 ",
-    "Fertigungstechnik 2                                                            ",
-    "Unternehmensführung                                                            ",
-    "Automatisierungstechnik und Industrieelektronik                                ",
-    "Automatisierungstechnik und Industrieelektronik - Werkstätte und Produktionstechnik ",
-    "Computer- und Informationstechnik                                              ",
-    "Werkzeugbau und Vorrichtungsbau                                                ",
-    "Kommunikationselektronik                                                       ",
-    "Computerarchitektur und Betriebssysteme                                        ",
-    "Unternehmensführung und Wirtschaftsrecht                                       ",
-    "Logistik                                                                       ",
-    "Konstruktion und Design                                                        "
-    };
-
-
-
-
-char SubN[][20] =
-{
-/*AELT*/    "E                 ",
-/*AM  */    "NWG               ",
-/*BESP*/    "DUK               ",
-/*COIT*/    "SOTE              ",
-/*CTNT*/    "NWWP              ",
-/*D   */    "AM                ",
-/*DUK */    "CTNT              ",
-/*DIC1*/    "AELT              ",
-/*E1  */    "GGP               ",
-/*E2  */    "ELWP              ",
-/*ELDE*/    "NW2               ",
-/*ELWP*/    "ELDE              ",
-/*FSST*/    "FSST              ",
-/*GGP */    "HWE1              ",
-/*HWE1*/    "ANTMT             ",
-/*KMEL*/    "CPE               ",
-/*KSN1*/    "AINF              ",
-/*LAB */    "DBI               ",
-/*MTRS*/    "POS1              ",
-/*NNWP*/    "ES                ",    // ?? ES_3, ES_4
-/*NW2 */    "ES1               ",
-/*NWG */    "BESP              ",
-/*PBE */    "BWM               ",
-/*R   */    "ANTMT             ",
-/*RK  */    "ANTMTWP           ",
-/*REL */    "AUT               ",
-/*ETH */    "CPE               ",
-/*SOTE*/    "FET1              ",
-/*UNF */    "KOP1              ",
-/*WIR3*/    "ETAT              ",
-/*SOPK*/    "FET1WP            ",     // ?? FET1WP_3, FET1WP_4
-/*NEW */    "BET               ",
-/*NEW */    "PROTWE            ",
-/*NEW */    "INFI              ",
-/*FOEX*/    "TMB               ",
-/*WIRE*/    "WPT               ",
-/*BION*/    "ETE               ",
-/*EMBE*/    "MANL              ",
-/*ORC5*/    "WIR               ",       // ??
-    "PRMN              ",
-    "LA1               ",
-    "APT1              ",
-    "NSCS              ",
-    "NVS1              ",
-    "WMC               ",
-    "ROBP              ",       // ??
-    "SYP1              ",
-    "PRMN              ",
-    "IE1               ",
-    "DIC1              ",
-    "MTRS              ",
-    "KSN1              ",
-    "MET1              ",
-    "PBE               ",
-    "FI                ",
-    "TMB               ",
-    "MME               ",
-    "FET               ",     // FET2 ????
-    "UNF               ",
-    "AUTI              ",
-    "ANTMTWP           ",
-    "COIT              ",
-    "WBVB              ",
-    "KMEL              ",
-    "CABS              ",
-    "UFW               ",
-    "LO1               ",      // LO ??
-    "KODES             "
-
-
-
-
-
-
-
-
-
-
-
-};
-
 
 int readF(FILE ** f, const char * s);
 int writeF(FILE ** f, const char * s);
 int delXUnderline(FILE * l, FILE * l_no_unders, int summer);
-
 int copyFile(FILE * d, FILE * s);
 int sortTab(FILE * tS, FILE * t); // sortiert <--- tab
 int combineSigmaLines(FILE * sL, FILE * sigma);
@@ -279,61 +35,31 @@ int tab2stat(FILE * tab, FILE * stat, FILE * prog);
 int sortSigma(FILE * si, FILE * so, FILE * cl);
 int createNewYear(FILE * n, FILE * t);
 int getClassId(char * className, int summer);
-
 int sort(char tab[][SMAX], int n);
 int delEQ(char tab[][SMAX], int n, int x);
 
-int ZweiKlassen4System;  // ???
-int ZweiKlassen5System;
-
-int getAllSubsOfThisClass(int j, int i, char(*t)[SMAX], char (*subs)[30]);
-int getAllFlecks(int j, char(*t)[SMAX]);
-
-int getClassIndex(char * classname); // ???
-int getSubId(char * sub);
-
-void CutNames(char * fromFile, char * directory);
-int procN[14] = {0}; // 0 == 1AFELC; 1 == 1AHELS; 2 == 1BHELS e.g.
-int gesN = 0, gesS = 0; // gesamt Zahl 5er einschließlich N, gesamt Zahl Schüler
-int mCounter;
-char dir[LEN];  // J2023
-
-
-
-
-    /******************************************************/
-    /**                    m a i n                       **/
-    /******************************************************/
+//*****************************************************************************
+//                               m a i n
+//*****************************************************************************
 
 int main(void)
 {
 FILE * liste, * listNoUnder, * tab, * fehl, * allTab, * notes, * percent,
      * sigmaList, * protEL, * protET, * protIF, * protMB, *mah,
-     * protWI, * check, * wel /* procEL  negList*/;
-char text[LINEMAX];
-char tnxt[LINEMAX];
-char FamNam[LINEMAX];
-char VorNam[LINEMAX];
-char Name[LINEMAX];
-char NextClass[LINEMAX];
-char Subject[LINEMAX];
-char Sub[LINEMAX];
-char Teacher[LINEMAX];
-char Date[LINEMAX];
-
-int i, j, k, l, m, n, ok, r, s, w,lines, nSubs, f, h, anzN,
-    gefunden, cId, sId, numberOfMembersWith5N, numberOfMembers;
-
+     * protWI, * check, * wel;
+char text[LINEMAX], tnxt[LINEMAX], FamNam[LINEMAX], VorNam[LINEMAX],
+     Name[LINEMAX], /*NextClass[LINEMAX],*/ Subject[LINEMAX], Sub[LINEMAX],
+     /*Teacher[LINEMAX],*/ Date[LINEMAX], qualifier[LINEMAX];
+int  i, j, k, l, m, n, ok, r, s, w,lines, nSubs, f, h, anzN,
+     gefunden, cId, sId, numberOfMembersWith5N, numberOfMembers;
 char compClass[12];
-char qualifier[LINEMAX];
 char (* t)[SMAX];
 char (* subs)[30];
 double subs5Prozent[30];
 int subs5Anz[30];
 int subsNAnz[30];
 int subsNAnzListe[30];
-
-int nFlecks;
+int nFlecks, pupils = 0, pupilsEL = 0;
 char ClassName[15];
 char Abt[5];
 float sigmaValue;
@@ -346,8 +72,7 @@ char mahnClass[LEN];
 char mahnSub[LEN];
 char mahnSurName[LEN];
 char mahnName[LEN];
-
-int summer; // if TRUE check die Jahresnote e.g. SS   else Semesternote e.g. WS
+int summer;
 
 
     /**┌────────────────────────────────────────────────┐**/
@@ -418,7 +143,7 @@ int summer; // if TRUE check die Jahresnote e.g. SS   else Semesternote e.g. WS
     printf("\n%s\n", command);
     system(command);
 
-getch();
+//getch();
 
     clrscr();
 
@@ -456,7 +181,7 @@ getch();
 
 
     gotoxy(0, 6); printf("Initialisierungen abgeschlossen ...... weiter?\n");
-    getch();
+//    getch();
 
 
 
@@ -543,8 +268,6 @@ getch();
 }
     /**└────────────────────────────────────────────────┘**/
 
-
-
     /**┌────────────────────────────────────────────────┐**/
 {   /**          3          Protokolle werden erstellt   **/
 
@@ -583,6 +306,10 @@ EL;N;06;1AHELS_J  ;AM;Seidl;Alex;
     do   // Tab wird in tab eigelesen ... Gleichzeitig werden hier Vorgezogene Prüfungen entfernt
     {
         fgets(text, LINEMAX, tab);
+        pupils++;
+        if (text[4] == 'L') pupilsEL++;  /* EL */
+
+
 
 
         if ((text[0] >= '0') && (text[0] <= '8') &&                      // nur Klassen zwischen dem 1 und 8 Jahrgang (Abendschule)!
@@ -618,6 +345,7 @@ EL;N;06;1AHELS_J  ;AM;Seidl;Alex;
             (compClass[3] != t[i][3]) ||           // E
             (compClass[4] != t[i][4]) ||           // L
             (compClass[5] != t[i][5])              // S .. an 6ter Stelle wäre E oder W, dies wird hier nicht als andere KLasse verstanden!
+
                                                    // neu hinzukommen wird B ! für bionics
 //            (compClass[6] != t[i][6]) ||           // E Embedded W Wireless
 //            (compClass[7] != t[i][7]) ||  // 4AHELSE oder 4AHELSW soll sich nicht unterscheiden
@@ -759,6 +487,7 @@ EL;N;06;1AHELS_J  ;AM;Seidl;Alex;
 
                 gefunden = 0;
                 r = 0;
+
 // qualifier enthält alle Gegenstände und alle Noten in einer Zeile - dient zum Suchen der Note
 
                 while((r < (strlen(qualifier) - strlen(subs[k]))) && (gefunden == 0))
@@ -795,8 +524,18 @@ EL;N;06;1AHELS_J  ;AM;Seidl;Alex;
                      ((qualifier[ + r + strlen(subs[k]) + 1]) == 'N')     )
                     )
                 {
-                    fprintf(wel,"%c%c,%c,%02d,%s,ddmmjj,00,0000,%s,%s,%s,\n",
-                            ClassName[3],ClassName[4],
+                    for (n = 0; n < strlen(ClassName); n++)
+                    {
+                         if (ClassName[n] == '_')  /// eliminate :S in 1AHELS_S
+                         {
+                             ClassName[n] = ' ';
+                             ClassName[n + 1] = ' ';
+                         }
+                    }
+                    ClassName[8] = '\0';
+
+                    fprintf(wel,"%c%c,%c,%02d,%s,jj.mm.dd,00,0000,%s,%s,%s,\n",
+                            ClassName[3],ClassName[4],  // Abteilung
                             qualifier[ + r + strlen(subs[k]) + 1], nFlecks, ClassName, subs[k], FamNam, VorNam); // für EL werden hier die Wiederholungsprüfungskandidaten gesammelt
                 }
 /*
@@ -994,6 +733,7 @@ fclose(percent);
     {
 
         fgets(text, LINEMAX, allTab);
+
 
 // Beistriche durch Strichpunkt ersetzen:
 
@@ -1349,99 +1089,62 @@ fclose(protWI);
     /**┌────────────────────────────────────────────────┐**/
 {   /**          5          Mahnungen eingetragen        **/
 
-
-
     printf("Schritt 5: Oeffne Mah.txt und trage in Wiederholungsp. ein\n");
-    // ?? wozu ?? system("cls");
+
+//exit(0);
 
     readF(&wel, "./Wiederholungspruefungen.csv");
     readF(&mah, "./Mah.csv");
 
-/*
-Klasse,Familienname,Vorname,Geburtsdatum,Gegenstand,FW-Datum,LehrerIn,FW-Art,FW-Anmerkung,,,,
-1ABMB,Guthan,Florian,06.09.1998,Englisch,04.05.2023,Vrana Philip,Mahnung,,,,,
-1AFELC,Aibartuev,Musa,26.08.2008,Naturwissenschaftliche Grundlagen,11.11.2022,Szabo Simona,Mahnung,,,,,
-1AFELC,Aibartuev,Musa,26.08.2008,Englisch,02.04.2023,Waidmayr Margit,Mahnung,,,,,
-*/
-    // wel in t einlesen.
 
-    //erste Zeile nicht...
-    fgets(text, LINEMAX, wel);
+
+
+    fgets(text, LINEMAX, wel);  // first line ignored
 
     i = 0;
 
     do   // Tab wird in tab eigelesen ... Gleichzeitig werden hier Vorgezogene Prüfungen entfernt
     {
-        fgets(text, LINEMAX, wel);
-        sprintf(t[i],"%s", text);
-        i++;
-    } while (!feof(wel));
+        fgets(text, LINEMAX, wel); sprintf(t[i],"%s", text);  i++;
+    }   while (!feof(wel));
 
     fclose(wel);
 
-    // sortieren ... zur Kontrolle...
     sort(t,i);
 
-    // Zeile für Zeile aus Mah lesen und in t eintragen
+    fgets(text, LINEMAX, mah);  // first line of mah.csv ignored
 
-    // printf("die Tabelle hat %d Zeilen\n", i);
-
-    fgets(text, LINEMAX, mah);
-
-    // printf("erste Zeile --->%s", text);
 
     f = 0;
 
-    while ((!feof(mah)) /*&& (f < 800)*/)  // zuerst nur die ersten paar Zeilen...
+    while (!feof(mah))
     {
-        fgets(text, LINEMAX, mah);
-//        system("cls");
-// printf("%3d %s\n", f, text);
+        fgets(text, LINEMAX, mah); f++;
 
+        for (l = 0; l < strlen(text); l++) if (text[l] == ';') text[l] = ','; // Replace Semicolum with Comma
 
-        f++;
         j = k = 0;  while (text[j] != ',') { ClassName[k] = text[j]; j++; k++; } ClassName[k] = '\0';
-
-        // printf("a) ClassName: .%s.\n", ClassName);
-
         j++; k = 0; while (text[j] != ',') { FamNam[k] = text[j];    j++; k++; } FamNam[k] = '\0';
-
         j++; k = 0; while (text[j] != ',') { VorNam[k] = text[j];    j++; k++; } VorNam[k] = '\0';
-
-//        printf("b) Name: .%s.  .%s.\n", FamNam, VorNam);
-
         j++;        while (text[j] != ',') {j++;} // Geb Datum wird übersprungen
 
-
         // Gegenstand einlesen und Kurzform finden.
-        //######
 
         sprintf(Subject, "                                                                                                    ");
 
         j++; k = 0; while ((text[j] != ',') && ((strcmp("Geografie", Subject) != 0))) { Subject[k] = text[j]; j++; k++; } Subject[k] = '\0';
-
 
         if (strncmp("Geografie", Subject, 9) == 0)  // weil GGP ein Gegenstand ist, in dem im Namen ein Beistich vorkommt!!!
         {
             j++; while (text[j] != ',') {j++;}
         }
 
-
-//        printf("k = %d \n", k);
-//        printf("c) sub: %s\n", Subject);
-
-
         j++; k = 0; while (text[j] != ',') { Date[k] = text[j];      j++; k++; } Date[k] = '\0';
 
-//        printf("d) Datum: !%s!\n", Date);
-
-        j++; k = 0; while (text[j] != ',') { Teacher[k] = text[j];   j++; k++; } Teacher[k] = '\0';
-
-//        printf("e) teacher: .%s.\n", Teacher);
+        // könnte man verwenden .... - doch wozu...
+        // j++; k = 0; while (text[j] != ',') { Teacher[k] = text[j];   j++; k++; } Teacher[k] = '\0';
 
         n = 0;
-
-//        printf("Subject: %s\n", Subject);
 
 
         for (k = 0; k < sizeof(SubNames)/LINEMAX;k++)
@@ -1450,7 +1153,6 @@ Klasse,Familienname,Vorname,Geburtsdatum,Gegenstand,FW-Datum,LehrerIn,FW-Art,FW-
             if (strncmp(Subject, SubNames[k], l) == 0)
             {
                 sprintf(Sub,"%s",SubN[k]);
-//                printf("f) SubN .%s.\n", SubN[k]);
                 k = sizeof(SubNames)/LINEMAX;
                 n = 1;
             }
@@ -1463,10 +1165,10 @@ Klasse,Familienname,Vorname,Geburtsdatum,Gegenstand,FW-Datum,LehrerIn,FW-Art,FW-
 
         r = 0; while ((Sub[r] != ' ') && (Sub[r] != '\0')) { r++; } Sub[r] = '\0';
 
-        // printf("---- read in tab --- \n");
-
         for (m = 0; m < i; m++)
         {
+// siehe vorbereitete Zeile: 537 ...   suche nach jj.mm.dd
+
 
             s = 0; while (t[m][s] != ',') { s++; } s++;
                    while (t[m][s] != ',') { s++; } s++;
@@ -1482,7 +1184,6 @@ Klasse,Familienname,Vorname,Geburtsdatum,Gegenstand,FW-Datum,LehrerIn,FW-Art,FW-
             r = 0; while (t[m][s] != ',') { mahnSurName[r] = t[m][s]; s++; r++; } s++; mahnSurName[r] = '\0';
             r = 0; while (t[m][s] != ',') { mahnName[r]    = t[m][s]; s++; r++; } s++; mahnName[r]    = '\0';
 
-
 // for tests:
 // if (m <= 100) printf("T:: %02d: .%s. Subject .%s. Name:.%s. name .%s.\n", m, mahnClass, mahnSub, mahnSurName, mahnName);
 
@@ -1490,66 +1191,61 @@ Klasse,Familienname,Vorname,Geburtsdatum,Gegenstand,FW-Datum,LehrerIn,FW-Art,FW-
                 ((strncmp(mahnName,VorNam,strlen(VorNam))) == 0) &&
                 ((strncmp(mahnSub,Sub,strlen(Sub))) == 0)     )
             {
-//                printf("== %d: class: .%s. name: .%s. .%s.  subj: .%s. date: %s\n",m, mahnClass, mahnSurName,  mahnName, Sub, Date);
+// printf("== %d: class: .%s. name: .%s. .%s.  subj: .%s. date: %s\n",m, mahnClass, mahnSurName,  mahnName, Sub, Date);
 
-                t[m][19] = Date[0];
-                t[m][20] = Date[1];
-                t[m][21] = Date[3];
-                t[m][22] = Date[4];
-                t[m][23] = Date[8];
-                t[m][24] = Date[9];
+                t[m][17] = Date[8];
+                t[m][18] = Date[9];
+                t[m][20] = Date[3];
+                t[m][21] = Date[4];
+                t[m][23] = Date[0];
+                t[m][24] = Date[1];
                 t[m][32]++;
-//                printf("m: %d %s", m, t[m]);
-mCounter++;
-
-
+                mCounter++;
 
 //printf("* %s, %s\n", Teacher, NextClass); // gefunden
-
-
             }
         }
-
-//printf("hier!\n");
-//        getch();
     }
 
 
-
-
-
-
-
-
-
-
-    //  mah schließen
-
     fclose(mah);
 
-printf("%d Mahnungen konnten zugeordnet werden\n", mCounter);
-
-
-
+    printf("%d Mahnungen konnten zugeordnet werden\n", mCounter);
 
     // Wiederholungsprüfungen sortieren und wieder speichern
 
     writeF(&wel,"./Wiederholungspruefungen.csv");
 
+printf("\n");
 
-    for (j = 0; j < i; j++) fprintf(wel,"%s", t[j]);
+    n = 0;
+    m = 0;
+
+    for (j = 0; j < i; j++)
+    {
+        sprintf(text, "%s", t[j]);
+
+        if ((text[1] == 'L') && (text[3] == '5'))
+        {
+            n++;
+            if (text[17] == 'j') m++;
+        }
+
+        // if (j < 10) printf("%s", text);   // for tests!
+
+        fprintf(wel,"%s", t[j]);
+    }
 
     fclose(wel);
 
 
-printf("%d 5er wurden gefunden\n", j);
+printf("%d 5er/N wurden gefunden!  Davon %d ohne Mahnung!\n", j, j - mCounter);
+printf("Schülerzahl: %d   5erproKopf %.2f\n", pupils, (float) j / pupils);
+printf("Schüler EL : %d   EL proKopf %.2f   (= %d 5er) ohne Mahnung: %d!\n", pupilsEL, (float) n / pupilsEL, n, m);
 
 
 }
     /**└────────────────────────────────────────────────┘**/
-
-
-
     return 0;
 }
 
@@ -2611,7 +2307,6 @@ long j, s, m, d;
                     // Durchschnitt aus J + S:
 
                     // Differenz aus J - S;
-//getch();
 
                     fprintf(sL,"%s",ctl);
                     sprintf(ctl,"                                                                   ");
@@ -2852,7 +2547,7 @@ int z;
         }
         //printf("\n%d\n", z);
 
- //getch();
+
         return z;
 }
 
