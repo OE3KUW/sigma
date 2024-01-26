@@ -13,14 +13,15 @@
 // 2.) Sokrates > Auswertung > Standard > 152 > Mahnungen
 // Gegenstand, FW-Datum, LehrerIn, Art  speichern unter: home>sigma>Mah.csv
 //*****************************************************************************
+///### diese Zeilen: imSommersemester genau ansehen !
+//*****************************************************************************
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
 #include "console.h"
 #include "sigma.h"
-
-#define SELTSAME_NOTEN_AUSGEBEN
 
 int readF(FILE ** f, const char * s);
 int writeF(FILE ** f, const char * s);
@@ -76,7 +77,7 @@ int summer;
 
 
     /**┌────────────────────────────────────────────────┐**/
-{   /**  I n i t s :       Dir createted, summer = T/F   **/
+{   /**          I n i t :                               **/
 
 
     initConsole();
@@ -216,9 +217,7 @@ int summer;
     /**┌────────────────────────────────────────────────┐**/
 {   /**          2                                       **/
 
-
     printf("Schritt 2: Liste.csv -> Tab.csv pro Schueler eine Zeile!\n");
-
 
     readF(&liste, "./Liste.csv");
     writeF(&tab, "./Tab.csv");
@@ -228,18 +227,13 @@ int summer;
 
     list2tab(liste, tab, fehl, allTab, summer);
 
-
-    // zunächst sollen alle Daten aller Abteilungen weggespeichert werden.
-
     fclose(tab);   // Tab.csv hat nun alle Noten, aller Abteilungen und aller Klassen aufgelistet.
 
-    // tab noch sortieren!  damit die Schüler mit "Vorläufigen Zeugnissen" mit in die Klassen einsortiert werden.
+    // Schüler mit "Vorläufigen Zeugnissen" werden in die Klassen mit einsortiert (sort)
 
     readF(&tab, "./Tab.csv");
 
     i = 0;
-
-
 
     do   // Tab wird in tab eigelesen ... Gleichzeitig werden hier Vorgezogene Prüfungen entfernt
     {
@@ -250,18 +244,13 @@ int summer;
 
     fclose(tab);
 
-
-
-    sort(t, i); // dadurch werden Schüler mit "nur" vorläufigen Zeugnissen miteinsortiert in ihre Klassen
-
-
+    sort(t, i);
     writeF(&tab, "./Tab.csv");
 
     for (j  = 0; j < i; j++)
     {
        fprintf(tab, "%s", t[j]);
     }
-
 
     fclose(tab);
 
@@ -875,22 +864,16 @@ fclose(protWI);
     // hier werden nun alle EL heraus gelöst und zwar nur die vom Jahresende
     // sie werden nach sigma sortiert.
 
-
     printf("Schritt 4: Sortiere fuer EL alle sigma-Wertungen! => sigmaList.csv\n");
-
-
 
     i = 0;
 
     readF(&tab, "./allAbtNotesWithSigma.csv");
-    writeF(&sigmaList, "./sigmaNames.csv");
-
+    writeF(&sigmaList, "./sigmaList.csv");
     writeF(&check, "./check.txt");
 
-
-
 // zuerst in tab lesen
-// dabei aber auch umsortieren - zuallererst kommt der sigma Wert --- fals EL Sommersemester!
+// dabei aber auch umsortieren - zuallererst kommt der sigma Wert --- falls EL Sommersemester!
 
     do   // Tab wird in tab eigelesen ... Gleichzeitig werden hier Vorgezogene Prüfungen entfernt
     {
@@ -898,19 +881,12 @@ fclose(protWI);
 
         if ((text[0] == 'E') && (text[1] == 'L') && (text[15] != ' '))
         {
-            // vorbereitet für Jahresschluss:  das muss für Februar 2021 geändert werden!
-
-// hier mit summer umschalten!
-//#####
-//            if (((text[3] == '1') && (text[10] ==  'J')) ||
-//                ((text[3] == '2') && (text[10] ==  'S')) ||
-//                ((text[3] == '3') && (text[10] ==  'S')) ||
-//                ((text[3] == '4') && (text[10] ==  'S'))    )
 
             if (((summer == FALSE) && (text[19] == '.'))   // fuer das erste Semester!
+
                 ||
 
-                ((summer == TRUE) &&                       // fuer das yweite Semester
+                ((summer == TRUE) &&                       // fuer das zweite Semester
 
                 (((text[3] == '1') && (text[10] ==  'J')) ||
                  (text[3] == '2') ||
@@ -918,14 +894,18 @@ fclose(protWI);
                  (text[3] == '4') ||
                  (text[3] == '5')    ))
 
-               //((text[3] == '4') && (text[8] ==  'S')))) // fuer das Sommersemester entferne 5te und 4AFELC
+               //((text[3] == '4') && (text[3] ==  'S')))) // fuer das Sommersemester entferne 5te und 4AFELC
                // with the line above - absolventen are filtered out!
 
                 )
             {
 
-                sprintf(t[i],"%c.%c%c%c%c%c%c| %s", text[18], text[20],text[21],text[22],text[23],text[24],text[25],text);
+                // hier wird die sigma Zahl vorgereiht:
+                sprintf(t[i],"%c.%c%c%c%c%c%c| %s", text[18], text[20], text[21], text[22], text[23], text[24], text[25],text);
 
+                // dadurch verschibt sich alles um 7 Zeichen + | und ein Leerzeichen nach rechts. E liegt dann auf 19!
+
+///### Bionics hier eingliedern? im Schuljahr 2024/ 2025 erstmals relefant - also mit S2025
 
                 if (t[i][19] == 'E') // Embedded
                 {
@@ -952,20 +932,16 @@ fclose(protWI);
     }   while (!feof(tab));
 
     // sort ...
-
-
-
     sort(t,i);
-
 
     for (j = 0; j < i; j++) fprintf(check,"%s", t[j]);
 
     fclose(check);
 
-    // i stores ne number of pubil
+    // i ist hier genau die Schüleranzahl der EL
+    // im check.txt kann überprüft werden: sigma Werte sind bereits korrekt (?) vorhanden
 
-
-    // erkenne gleich gute Schüler und ergänze einen Reihungswert
+    // erkenne gleich gute Schüler und ergänze einen Reihungswert:
 
     sprintf(sigmaValueBefore,"0.000000");
     sigmaValueBefore[8] = '\0';
@@ -996,7 +972,7 @@ fclose(protWI);
          j++;
     }
 
-    // speichere alles wieder ein
+    // speichere alles wieder -> sigmaNames.csv
 
     j = 0;
 
@@ -1006,79 +982,10 @@ fclose(protWI);
         j++;
     }
 
-
-
     fclose(sigmaList);
     fclose(tab);
 
-    // resort sigma list:
-
-    readF(&tab, "./sigmaNames.csv");
-    writeF(&sigmaList, "./sigmaList.csv");
-
-
-
-
-// zuerst in tab lesen
-// ########
-// dabei aber auch umsortieren - zuallererst kommt der sigma Wert --- falls EL Sommersemester!
-
-    do   // Tab wird in tab eigelesen ... Gleichzeitig werden hier Vorgezogene Prüfungen entfernt
-    {
-        if (fgets(text, LINEMAX, tab) != 0)
-        {
-            i = 28;
-            j = 0;
-            l = 0;
-            while (text[i] != '\0') {Name[j] = text[i]; i++; j++; l++;}
-            Name[l - 1] = ',';
-            Name[l] = '\0';
-
-            tnxt[0] = text[0];
-            tnxt[1] = text[1];
-            tnxt[2] = text[2];
-            tnxt[3] = text[3];
-            for (m = 0; m < l ; m++) text[4 + m ] = Name[m];
-            tnxt[ 4 + l] = text[4];
-            tnxt[ 5 + l] = text[5];
-            tnxt[ 6 + l] = text[6];
-            tnxt[ 7 + l] = text[7];
-            tnxt[ 8 + l] = text[8];
-            tnxt[ 9 + l] = text[9];
-            tnxt[10 + l] = text[10];
-            tnxt[11 + l] = text[11];
-            tnxt[12 + l] = text[12];
-            tnxt[13 + l] = text[13];
-            tnxt[14 + l] = text[14];
-
-            tnxt[15 + l] = text[18];
-            tnxt[16 + l] = text[19];
-            tnxt[17 + l] = text[20];
-            tnxt[18 + l] = text[21];
-            tnxt[19 + l] = text[22];
-            tnxt[20 + l] = text[23];
-            tnxt[21 + l] = text[24];
-            tnxt[22 + l] = text[25];
-            tnxt[23 + l] = text[26];
-
-            //sprintf(tnxt, "%c%c%c%c%s%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c",
-            //            //  1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5
-            //text[0],  text[1],  text[2],  text[3],  Name,
-            //text[4],  text[5],  text[6],  text[7],  text[8],
-            //text[9],  text[10], text[11], text[12], text[13],
-            //text[14], // Klasse
-            //          text[18], text[19], text[20], text[21],
-            //text[22], text[23], text[24], text[25], text[26]
-            //  );
-            tnxt[l + 4 + 11 + 9] = '\0';
-
-            fprintf(sigmaList,"%s\n",tnxt);
-        }
-    }   while (!feof(tab));
-
-    fclose(sigmaList);
-    fclose(tab);
-
+    // ins direktory ablegen:
 
     sprintf(command,"cp ./sigmaList.csv ./%c%c%c%c%c%c/sigmaList.csv", dir[0], dir[1], dir[2], dir[3], dir[4], dir[5]);
     system(command);
@@ -1091,13 +998,8 @@ fclose(protWI);
 
     printf("Schritt 5: Oeffne Mah.txt und trage in Wiederholungsp. ein\n");
 
-//exit(0);
-
     readF(&wel, "./Wiederholungspruefungen.csv");
     readF(&mah, "./Mah.csv");
-
-
-
 
     fgets(text, LINEMAX, wel);  // first line ignored
 
@@ -1240,8 +1142,8 @@ printf("\n");
 
 
 printf("%d 5er/N wurden gefunden!  Davon %d ohne Mahnung!\n", j, j - mCounter);
-printf("Schülerzahl: %d   5erproKopf %.2f\n", pupils, (float) j / pupils);
-printf("Schüler EL : %d   EL proKopf %.2f   (= %d 5er) ohne Mahnung: %d!\n", pupilsEL, (float) n / pupilsEL, n, m);
+printf("Schülerzahl: %d   5er pro Kopf %.2f\n", pupils, (float) j / pupils);
+printf("Schüler EL : %d    EL  pro Kopf %.2f   (= %d 5er) ohne Mahnung: %d!\n", pupilsEL, (float) n / pupilsEL, n, m);
 
 
 }
@@ -1399,22 +1301,18 @@ char tvorname[LEN];
 char tsub[LEN];
 char tval[LEN];
 char tjvs;
-
 char lastName[LEN] = {0};
 char lastVorName[LEN] = {0};
-
 int i, j;
 int not[6] = {0};
 int sum[6][2][6][6] = {{{{0}}}};
 int sch[6][2][6] = {{{0}}};
 int jg, hf, ab, no, n;
 int ojg, ohf, oab;
-int zeile = 1;
-
 int auswerten;
 int length;
 
-    fgets(text, LINEMAX, l); // Klasse,Zeugnisart,Zeugnisdatum,Familienname,Vorname,Kurzbezeichnung,Note,Schulformkennzahl
+    fgets(text, LINEMAX, l); // erste Zeile ignorieren (Klasse, Name, usw.)
 
     jg = hf = ab = no = n = 0;
 
@@ -1424,29 +1322,24 @@ int length;
 
         length = strlen(text);
 
-        zeile++;  // braucht das wer? - wo ?
-
         if (length > 0)
         {
 
             i = 0;
             j = 0;
 
-            while ((text[i] != ',') /*&& (text[i] != '_')*/)   // class:  _WS  _SS abschneiden
-            // für die weitere Arbeiten brauchen wir die Semesterinformation WS oder SS
+            while ((text[i] != ',') )
             {
                 tclass[j] = text[i];
                 j++;
                 i++;
             }
 
-
             if (tclass[0] == '1')
             {
                 tclass[j] = '_'; j++;
-                tclass[j] = text[i+1];j++;    // fügt J oder S ein
-                                            // J Jahreszeugnis
-                                            // S Schulnachricht
+                tclass[j] = text[i+1];
+                j++;  // fügt J oder S ein,  dabei bedeutet J Jahreszeugnis und S Schulnachricht
             }
 
             tclass[j] = '\0';
@@ -1456,7 +1349,7 @@ int length;
             oab = ab;
 
             jg = tclass[0] - '0';
-            hf = (tclass[2] == 'H') ? 1 : 0;  // stand auf 0:1 ... ?
+            hf = (tclass[2] == 'H') ? 1 : 0;
             ab = ((tclass[3] == 'E') && (tclass[4] == 'L')) ? 1 :
                  ((tclass[3] == 'E') && (tclass[4] == 'T')) ? 2 :
                  ((tclass[3] == 'I') && (tclass[4] == 'F')) ? 3 :
@@ -1465,46 +1358,54 @@ int length;
 
 
                 i++;
-                tjvs = text[i];
+                tjvs = text[i]; // J für Jahreszeugnis S für Semesterzeugnis  V für Vorläufiges Zeugnis
 
-//printf("%c\n", tjvs);   // J für Jahreszeugnis   S für Semesterzeugnis  V für Vorläufiges Zeugnis
-            if (tjvs  == 'V') {tjvs = text[i + 13]; }   // Vorläufiges Semesterzeugnis bzw. Vorläufiges Jahreszeugnis
-// das es vorläufig ist, macht nichts aus...
-//#### sicherlich noch nicht die beste Lösung!
+            if (tjvs  == 'V') {tjvs = text[i + 13]; }
 
             auswerten = FALSE;
 
-            // summer:
+            // Abendschule:
 
-                if (summer == TRUE)
-                {
-                    if (tjvs == 'J') auswerten = TRUE;
+            if (summer == TRUE)  // Jahresabschluss
+            {
+                 if (tjvs == 'J') auswerten = TRUE;
 
-                    if ((tjvs == 'S') && (text[i + 1] == 'e'))  // Semesterzeugnis!
-                    {
-                        if (text[i - 3] == 'S') auswerten = TRUE;  // sommersemesterzeugnis!
-                        if ((tclass[0] == '2') && (tclass[2] == 'B')) auswerten = TRUE;  // Abendschule Sommer
-                        if ((tclass[0] == '4') && (tclass[2] == 'B')) auswerten = TRUE;  // Abendschule Sommer
-                        if ((tclass[0] == '6') && (tclass[2] == 'B')) auswerten = TRUE;  // Abendschule Sommer
-                        if ((tclass[0] == '8') && (tclass[2] == 'B')) auswerten = TRUE;  // Abendschule Sommer
-                    }
+                 if ((tjvs == 'S') && (text[i + 1] == 'e'))  // Semesterzeugnis!
+                 {
 
-                }
-                else
-                {
-                    if ((tjvs == 'S') && (text[i + 1] == 'c')) auswerten = TRUE; // Schulnachricht
+                    if (text[i - 3] == 'S') auswerten = TRUE;  // Sommersemesterzeugnis!
 
-                    if ((tjvs == 'S') && (text[i + 1] == 'e'))  // Semesteryeugnis!
-                    {
-                    if (text[i - 3] == 'W') auswerten = TRUE;  // sommersemesteryeugnis!
+///### imSommersemester genau ansehen !
+///### Welche Klassen finden sich in List.csv - und welche Abendschulklassen müssen deshalb mit ausgewertet werden.
+///### findet sich am Ende von List.csv
+
                     if ((tclass[0] == '1') && (tclass[2] == 'B')) auswerten = TRUE;  // Abendschule Sommer
                     if ((tclass[0] == '3') && (tclass[2] == 'B')) auswerten = TRUE;  // Abendschule Sommer
                     if ((tclass[0] == '5') && (tclass[2] == 'B')) auswerten = TRUE;  // Abendschule Sommer
                     if ((tclass[0] == '7') && (tclass[2] == 'B')) auswerten = TRUE;  // Abendschule Sommer
 
-                    }
+                    if ((tclass[0] == '2') && (tclass[2] == 'B')) auswerten = TRUE;  // Abendschule Sommer
+                    if ((tclass[0] == '4') && (tclass[2] == 'B')) auswerten = TRUE;  // Abendschule Sommer
+                    if ((tclass[0] == '6') && (tclass[2] == 'B')) auswerten = TRUE;  // Abendschule Sommer
+                    if ((tclass[0] == '8') && (tclass[2] == 'B')) auswerten = TRUE;  // Abendschule Sommer
 
+                 }
+            }
+            else                 // Semesterabschluss
+            {
+                 if ((tjvs == 'S') && (text[i + 1] == 'c')) auswerten = TRUE; // Schulnachricht
 
+                 if ((tjvs == 'S') && (text[i + 1] == 'e'))  // Semesterzeugnis!
+                 {
+
+                    if (text[i - 3] == 'W') auswerten = TRUE;  // Sommersemesteryeugnis!
+
+                    if ((tclass[0] == '2') && (tclass[2] == 'B')) auswerten = TRUE;  // Abendschule Sommer
+                    if ((tclass[0] == '4') && (tclass[2] == 'B')) auswerten = TRUE;  // Abendschule Sommer
+                    if ((tclass[0] == '6') && (tclass[2] == 'B')) auswerten = TRUE;  // Abendschule Sommer
+                    if ((tclass[0] == '8') && (tclass[2] == 'B')) auswerten = TRUE;  // Abendschule Sommer
+
+                 }
             }
 
             while (text[i] != ',') // Schulnachricht bzw. Zeugnis
@@ -1578,44 +1479,7 @@ int length;
                 {
                     fprintf(fehl, "RDP/AP 5er!, %s", text);
                 }
-
             }
-
-
-/* Noten     umleiten seit 2020 April abgeschalten!
-        if (!((tval[0] >= '0') && (tval[0] <= '5')))
-        {
-            if      ( tval[0] == 'S') {tval[0] = '1'; tval[1] = '\0';}   // Sehr zufriedenstellend
-            else if ( tval[0] == 'Z') {tval[0] = '2'; tval[1] = '\0';}   // Zufriedenstellend
-            else if ( tval[0] == 'W') {tval[0] = '3'; tval[1] = '\0';}   // Wenig zufriedenstellend
-            else if ((tval[0] == 'N') && (tval[1] == 'Z') )
-                                      {tval[0] = '8'; tval[1] = '\0';}   // Nicht zufriedenstellend
-
-            else if ( tval[0] == 'B') {tval[0] = '1'; tval[1] = '\0';}   // Befreit   -   um diese Schüler nicht zu benachteiligen!
-            else if ( tval[0] == 'T') {tval[0] = '1'; tval[1] = '\0';}   // Teilgenommen zählt als Sehr Gut
-            else if ( tval[0] == 'G') {tval[0] = '6'; tval[1] = '\0';}   // Gestundet wird vorläufig nicht gewertet
-            else if ( tval[0] == 'N') {tval[0] = '7'; tval[1] = '\0';}   // Nicht beurteilt - wie 6
-            else if ( tval[0] == 'F') {tval[0] = '9'; tval[1] = '\0';}   // Nichts abgegeben ... Diplomarbeit ...
-            else if ( tval[0] == 'X') {tval[0] = '9'; tval[1] = '\0';}   // 2018 in einer Abendschule - Bedeutung unklar         else if ( tval[0] == 'Y') {tval[0] = '9'; tval[1] = '\0';}   // ist in Mödling vorgekommen ...
-
-            else
-            {
-#ifdef SELTSAME_NOTEN_AUSGEBEN
-            printf("seltsame Note = .%c. zeile %d :: %s %s %s\n", tval[0], zeile, tclass, tname, tsub);
-#endif
-            }
-            n =  (tval[0] == '0') ? 0 :   // 0 .... keine Note eingegeben!
-                 (tval[0] == '1') ? 1 :
-                 (tval[0] == '2') ? 2 :
-                 (tval[0] == '3') ? 3 :
-                 (tval[0] == '4') ? 4 :
-                 (tval[0] == '5') ? 5 : 0;
-
-            not[n]++;
-        }
-*/
-
-
 
             j = 0;
             while (text[i] != '\n')
@@ -1628,20 +1492,12 @@ int length;
             i++;
 
 
-
-
-//        printf("%s",text);
-//        printf("%s %s %s %s\n",tname, tvorname, tsub, tval);
-
             if (strcmp(tclass,"4BHELS") == 0) ZweiKlassen4System = 1;
             if (strcmp(tclass,"5BHELS") == 0) ZweiKlassen5System = 1;
-
-
 
             if ((strcmp(lastName,tname) != 0) || (strcmp(lastVorName,tvorname) != 0))
             {
 
-                //printf("%s\n", tname);
                 sprintf(lastName,"%s",tname);
                 sprintf(lastVorName,"%s",tvorname);
                 if (auswerten == TRUE) fprintf(t,"\n");
@@ -1650,9 +1506,10 @@ int length;
                 hf = ohf;
                 ab = oab;
 
-                if ((jg <= 5)  && (tclass[2] != 'B'))
             // statistik interessiert nur für Klassen 1 bis 5 - nicht eine AP_ Klasse, oder eine BRP Klasse usw.
             // auch Abendschule wird hier ausgesiebt
+
+                if ((jg <= 5)  && (tclass[2] != 'B'))
                 {
                     sum[jg][hf][ab][0] += not[0]; not [0] = 0;
                     sum[jg][hf][ab][1] += not[1]; not [1] = 0;
@@ -1660,12 +1517,10 @@ int length;
                     sum[jg][hf][ab][3] += not[3]; not [3] = 0;
                     sum[jg][hf][ab][4] += not[4]; not [4] = 0;
                     sum[jg][hf][ab][5] += not[5]; not [5] = 0;
-
                     sch[jg][hf][ab]++;
                 }
 
                 jg = hf = ab = no = n = 0;
-
 
                 if ((strncmp(tclass,"4AHELS", 6) == 0)  ||
                     (strncmp(tclass,"4BHELS", 6) == 0)  ||
@@ -1690,27 +1545,10 @@ int length;
                         tclass[6] = 'W';
                     }
 
-                // #### mit dem neuen Schwerpunkten kommt es hier zu neuen Nummern!  erstmals 2024 / 2025 im Semester!
+///### mit dem neuen Schwerpunkten kommt es hier zu neuen Nummern!  erstmals 2024 / 2025 im Semester!
 
 
                 }
-/*
-if (strn    cmp(tclass,"1OHEL",5) == 0)
-{
-    if (    strncmp(tname,"Furmanov", 8) == 0)
-    {
-            printf("#\n");
-
-            if (auswerten == TRUE) printf("%-10s,%c,", tclass,tjvs / *stundentafel* /);  // Klassen auf 10 Zeichen mit Blanks auffüllen
-        if (auswerten == TRUE) printf("%s,%s,",tname,tvorname);
-        if (auswerten == TRUE) printf("%s,%s,",tsub,tval);
-
-
-    }
-
-}
-*/
-
 
                 if (auswerten == TRUE) fprintf(t, "%-10s,%c,", tclass,tjvs /*stundentafel*/);  // Klassen auf 10 Zeichen mit Blanks auffüllen
                 if (auswerten == TRUE) fprintf(t,"%s,%s,",tname,tvorname);
@@ -1730,13 +1568,12 @@ if (strn    cmp(tclass,"1OHEL",5) == 0)
                      (tval[0] == '5') ? 5 : 0;
 
                     not[n]++;
-
             }
         }
 
     } while (!feof(l));
 
-// frage    : braucht das wer?
+// Statistik ...
 
     if (    auswerten == TRUE) fprintf(a,"Abt, Klassse, Anzahl, n/s, 1, 2, 3, 4, 5, G, Sum, pro Kopf 1, 2, 3, 4, 5, G, Prozent, 1, 2, 3, 4, 5, G\n");
 
