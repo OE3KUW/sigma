@@ -12,6 +12,8 @@
 // Exportieren als Liste.csv - wichtig: Komma nicht Semicolom
 // 2.) Sokrates > Auswertung > Standard > 152 > Mahnungen
 // Gegenstand, FW-Datum, LehrerIn, Art  speichern unter: home>sigma>Mah.csv
+// 3. Subjject not found: Namen in sigma.h ans Ende der Listen eintragen
+// in Untis Fächer Stammdaten Gegenstandskurzbezeichnung finden und eintragen.
 //*****************************************************************************
 ///### diese Zeilen: imSommersemester genau ansehen !
 //*****************************************************************************
@@ -295,10 +297,8 @@ EL;N;06;1AHELS_J  ;AM;Seidl;Alex;
     do   // Tab wird in tab eigelesen ... Gleichzeitig werden hier Vorgezogene Prüfungen entfernt
     {
         fgets(text, LINEMAX, tab);
-        pupils++;
-        if (text[4] == 'L') pupilsEL++;  /* EL */
 
-
+        pupils++;  if (text[4] == 'L') pupilsEL++;  /* EL */
 
 
         if ((text[0] >= '0') && (text[0] <= '8') &&                      // nur Klassen zwischen dem 1 und 8 Jahrgang (Abendschule)!
@@ -324,8 +324,6 @@ EL;N;06;1AHELS_J  ;AM;Seidl;Alex;
 
     sprintf(compClass,"%c%c%c%c%c%c%c%c%c%c", t[j][0], t[j][1], t[j][2], t[j][3], t[j][4], t[j][5], t[j][6], t[j][7], t[j][8], t[j][9] );
 
-
-
     for (i = 0; i < lines; i++)    // für alle Einträge
     {
         if ((compClass[0] != t[i][0]) ||           // 5
@@ -344,7 +342,6 @@ EL;N;06;1AHELS_J  ;AM;Seidl;Alex;
        {   // eine neue Klasse wurde gefunden - daher wird die bisherige nun als Block ausgewertet:
 
 
-
        /**
          * Auswertung einer Klasse:
          *
@@ -358,10 +355,11 @@ EL;N;06;1AHELS_J  ;AM;Seidl;Alex;
 
 
             cId = getClassId(compClass, summer);  // diese Id ist wichtig für die Gewichtung der Noten
-            // compClass zb 1AHELS
-            // t[j][11] hier steht J für Ganzjahr oder S für Semester....
-            // summer enthält die gleiche Info!
 
+// Tests ...if (strncmp(compClass, "5AHELSE", 7) == 0)
+// Tests ...{
+// Tests ...printf("Klasse: %s  cId %d\n", compClass, cId);
+// Tests ...}
 
 //if (cId < 0) printf("class: ---> %s found!\n",compClass);  ///  for tests only
 
@@ -371,9 +369,6 @@ EL;N;06;1AHELS_J  ;AM;Seidl;Alex;
             // somit wissen wir, wieviele Gegenstände es in dieser Klasse gibt (nSubs) und auch welche (subs)
 
             // Arrays mit lauter Null-Einträgen wird vorbereitet:
-
-
-
 
             for (k = 0; k < nSubs; k++) subs5Anz[k] = subs5Prozent[k] = subsNAnz[k] = 0;
 
@@ -407,16 +402,7 @@ EL;N;06;1AHELS_J  ;AM;Seidl;Alex;
                 sigmaValue = 7.654321;                   // für die spätere Auswertung wird hier Platz geschaffen
                 fprintf(notes,"%.6f, ", sigmaValue);
 
-            // name
-            //while(t[j][r] != ',') {fprintf(notes,"%c", t[j][r]); r++;}  fprintf(notes,","); r++;
 
-//Control: if ((t[j][r] == 'S') && (t[j][r + 1] == 'p') && (t[j][r + 2] == 'e') && (t[j][r + 3] == 'c'))
-//{
-//printf("* %c%c%c%c%c%c\n", t[j][r], t[j][r + 1], t[j][r + 2], t[j][r + 3], t[j][r + 4],  t[j][r + 5] );
-//
-//contr = 1;
-//}
-//else contr = 0;
                 f = 0;
                 while(t[j][r] != ',')
                 {
@@ -427,10 +413,6 @@ EL;N;06;1AHELS_J  ;AM;Seidl;Alex;
                 }
                 FamNam[f] = '\0';
                 fprintf(notes,","); r++;
-
-
-
-
 
             // Vorname
                 h = 0;
@@ -447,22 +429,16 @@ EL;N;06;1AHELS_J  ;AM;Seidl;Alex;
 
                 s = (s / 2) + 50;  // Umlaute, Sonderezeichen...
 
-
-
                 while(r < s) {fprintf(notes," "); r++;} fprintf(notes,",");
 
                 // bis hier steht zB.:
                 // EL,1AFELC    , 7, 0.123456, Arslan,Furkan Alp,                   ,
                 // in notes
                 // nun folgen die Gegenstände
-
                 // in qualifier ist der string gespeichert - ab verh, der alle Gegensände und Noten des Schülers beinhaltet
 
                 w = 0; // gewichte = Summe aller Noten * Notengewicht
                 n = 0; // Anzahl der Notengewichte
-
-
-
 
                 for (k = 0; k < nSubs; k++)   // eine Zeile wird eingetragen:
                 {
@@ -470,10 +446,6 @@ EL;N;06;1AHELS_J  ;AM;Seidl;Alex;
 //################################################################
 // hier wird nun jeder Gegenstand und seine Note eingetragen:
 //################################################################
-
-
-
-
                 gefunden = 0;
                 r = 0;
 
@@ -491,13 +463,6 @@ EL;N;06;1AHELS_J  ;AM;Seidl;Alex;
                         if (cId >= 0) sId = getSubId(subs[k]);  // liefert die Zeilennummer der Gewichtstabelle  ... > 0 damit keine andere Abteilungen ....... den die haben -1 !!!
 
 
-//#######
-//#######  hier wird ab 2023/2024 eine neue Stundentafel verwendet werden.
-//#######
-//#######
-//#######
-
-
 // Control: if ( contr)
 //{
 //printf("| sub %s %c %d ", subs[k], qualifier[ + r + strlen(subs[k]) + 1], weight[sId][cId] );
@@ -508,17 +473,16 @@ EL;N;06;1AHELS_J  ;AM;Seidl;Alex;
 
 // falls 5er rausschreiben
 
-                if (/*(nFlecks > 0) && (nFlecks < 3) && (Abt[1] == 'L') && */
-                    (((qualifier[ + r + strlen(subs[k]) + 1]) == '5') ||
-                     ((qualifier[ + r + strlen(subs[k]) + 1]) == 'N')     )
-                    )
+                if (((qualifier[ + r + strlen(subs[k]) + 1]) == '5') ||
+                    ((qualifier[ + r + strlen(subs[k]) + 1]) == 'N')     )
+
                 {
-                    for (n = 0; n < strlen(ClassName); n++)
+                    for (s = 0; s < strlen(ClassName); s++)
                     {
-                         if (ClassName[n] == '_')  /// eliminate :S in 1AHELS_S
+                         if (ClassName[s] == '_')  /// eliminate :S in 1AHELS_S
                          {
-                             ClassName[n] = ' ';
-                             ClassName[n + 1] = ' ';
+                             ClassName[s] = ' ';
+                             ClassName[s + 1] = ' ';
                          }
                     }
                     ClassName[8] = '\0';
@@ -556,13 +520,16 @@ Anzahl der 5er, Monat Tag Jahr der letzten Mahnung,  Lehrer...
 
                                 if (m == 5) anzN++; // Anzahl der Nicht genügend bzw Nicht beurteilt der Abteilung
 
-//printf("geg: %s Note %d Gewicht %d Summe w= %d Summe aller n= %d\n",subs[k], weight[sId][cId], m,w,n);
-
+// Tests ...if (strncmp(compClass, "5AHELSE", 7) == 0)
+// Tests ...{
+// Tests ...    printf("geg: %6s k %02d sId %02d Gewicht %02d Note %d Summe w= %03d SummeGew: %03d\n",
+// Tests ...               subs[k], k, sId, weight[sId][cId], m, w, n);
+// Tests ...}
                             }
                             else
                             {
                                 if ((m != '0') && (m != 0)) // 0 bedeutet Note fehlt!
-                                printf("Notengewicht im Gegenstant %s von %c ergibt???\n", subs[k], m);
+                                    printf("Notengewicht im Gegenstant %s von %c ergibt???\n", subs[k], m);
                             }
                         }
 
@@ -586,7 +553,6 @@ Anzahl der 5er, Monat Tag Jahr der letzten Mahnung,  Lehrer...
                 }
                 if (gefunden == 0)
                 {
-
                     for (s = 0; s < strlen(subs[k]); s++) fprintf(notes, " ");   //Gegenstand für Gegenstand wird eingetragen....
                     fprintf(notes, ", ,");
                 }
@@ -787,7 +753,6 @@ fclose(protWI);
 // alle hinten angefügten sigma WSerte müssen jetzt noch nach vo übertragen werden.
 
 
-
     readF(&allTab, "./allAbtTabNotes.csv");
     writeF(&notes, "./allAbtNotesWithSigma.csv");
 
@@ -810,8 +775,6 @@ fclose(protWI);
 
             text[l - 11] = text[l-1];
             text[l - 10] = text[l];
-
-
 
             //printf("%s", text);
         }
@@ -1468,7 +1431,7 @@ int length;
                 }
                 else
                 {
-                    fprintf(fehl, "NOTE fehlet, %s", text);
+                    fprintf(fehl, "NOTE fehlt, %s", text);
                 }
 
                 tval[0] = '0';
@@ -2539,6 +2502,12 @@ int ret = -1;
 // Frage: wo kommen die E und W her?
 // ?
 
+//                  0 1 2 3 4 5 6 7   8 9 0 1 2 3 4 5 6 7 8 9 0 1   2 3 4 5 6
+//                  1 1 2 2 3 3 4 4   1 1 2 2 3 3 4 4 4 4 5 5 5 5   1 2 3 4 5
+//                  F F F F F F F F   H H H H H H H H H H H H H H   H H H H H
+//                  S J W S W W W S   S J W S W S W S W S S J S J   S W W W S
+//                                                E E W W E E W W   b i o n i c s
+
 
     if      (strncmp(className,"1AFELC_S",  8) == 0) ret = 0;
     else if (strncmp(className,"1AFELC_J",  8) == 0) ret = 1;
@@ -2562,8 +2531,6 @@ int ret = -1;
     else if (strncmp(className,"2AHELS_WS", 9) == 0) ret = 10;
     else if (strncmp(className,"2AHELS_SS", 9) == 0) ret = 11;
 
-///####    3AHELS alleine gibt es auch!
-
     else if (strncmp(className,"3AHELS",    6) == 0) ret = (summer == TRUE) ? 13 : 12;
     else if (strncmp(className,"3AHELS_WS", 9) == 0) ret = 12;
     else if (strncmp(className,"3AHELS_SS", 9) == 0) ret = 13;
@@ -2576,7 +2543,7 @@ int ret = -1;
     else if (strncmp(className,"4AHELSWWS", 9) == 0) ret = 16;
     else if (strncmp(className,"4AHELSWSS", 9) == 0) ret = 17;
 
-    else if (strncmp(className,"5AHELSE",   7) == 0) ret = (summer == TRUE) ? 19 : 17;
+    else if (strncmp(className,"5AHELSE",   7) == 0) ret = (summer == TRUE) ? 19 : 18;
     else if (strncmp(className,"5AHELSEWS", 9) == 0) ret = 18;
     else if (strncmp(className,"5AHELSESS", 9) == 0) ret = 19;
 
@@ -2615,10 +2582,10 @@ int ret = -1;
 // und die B Klassen
 // ?
 
-
     if ((dir[3] == '2') && (dir[4] == '4'))   // 2024
     {
-         if (strncmp(className,"1AHELS_S",  8) == 0) ret = 22;
+         if (strncmp(className,"1AHELS",    6) == 0) ret = 22;
+    else if (strncmp(className,"1AHELS_S",  8) == 0) ret = 22;
     else if (strncmp(className,"1AHELS_J",  8) == 0) ret = 22;
     else if (strncmp(className,"1BHELS_S",  8) == 0) ret = 22;
     else if (strncmp(className,"1BHELS_J",  8) == 0) ret = 22;
@@ -2628,14 +2595,16 @@ int ret = -1;
 
     else if ((dir[3] == '2') && (dir[4] == '5'))   // 2025
     {
-         if (strncmp(className,"1AHELS_S",  8) == 0) ret = 22;
+         if (strncmp(className,"1AHELS",    6) == 0) ret = 22;
+    else if (strncmp(className,"1AHELS_S",  8) == 0) ret = 22;
     else if (strncmp(className,"1AHELS_J",  8) == 0) ret = 22;
     else if (strncmp(className,"1BHELS_S",  8) == 0) ret = 22;
     else if (strncmp(className,"1BHELS_J",  8) == 0) ret = 22;
     else if (strncmp(className,"1CHELS_S",  8) == 0) ret = 22;
     else {if (strncmp(className,"1CHELS_J",  8) == 0) ret = 22;}
 
-         if (strncmp(className,"2AHELS_S",  8) == 0) ret = 23;
+         if (strncmp(className,"2AHELS",    6) == 0) ret = 23;
+    else if (strncmp(className,"2AHELS_S",  8) == 0) ret = 23;
     else if (strncmp(className,"2AHELS_J",  8) == 0) ret = 23;
     else if (strncmp(className,"2BHELS_S",  8) == 0) ret = 23;
     else if (strncmp(className,"2BHELS_J",  8) == 0) ret = 23;
@@ -2646,21 +2615,24 @@ int ret = -1;
 
     else if ((dir[3] == '2') && (dir[4] == '6'))   // 2026
     {
-         if (strncmp(className,"1AHELS_S",  8) == 0) ret = 22;
+         if (strncmp(className,"1AHELS",    6) == 0) ret = 22;
+    else if (strncmp(className,"1AHELS_S",  8) == 0) ret = 22;
     else if (strncmp(className,"1AHELS_J",  8) == 0) ret = 22;
     else if (strncmp(className,"1BHELS_S",  8) == 0) ret = 22;
     else if (strncmp(className,"1BHELS_J",  8) == 0) ret = 22;
     else if (strncmp(className,"1CHELS_S",  8) == 0) ret = 22;
     else {if (strncmp(className,"1CHELS_J",  8) == 0) ret = 22;}
 
-         if (strncmp(className,"2AHELS_S",  8) == 0) ret = 23;
+         if (strncmp(className,"2AHELS",    6) == 0) ret = 23;
+    else if (strncmp(className,"2AHELS_S",  8) == 0) ret = 23;
     else if (strncmp(className,"2AHELS_J",  8) == 0) ret = 23;
     else if (strncmp(className,"2BHELS_S",  8) == 0) ret = 23;
     else if (strncmp(className,"2BHELS_J",  8) == 0) ret = 23;
     else if (strncmp(className,"2CHELS_S",  8) == 0) ret = 23;
     else {if (strncmp(className,"2CHELS_J",  8) == 0) ret = 23;}
 
-         if (strncmp(className,"3AHELS_S",  8) == 0) ret = 24;
+         if (strncmp(className,"3AHELS",    6) == 0) ret = 24;
+    else if (strncmp(className,"3AHELS_S",  8) == 0) ret = 24;
     else if (strncmp(className,"3AHELS_J",  8) == 0) ret = 24;
     else if (strncmp(className,"3BHELS_S",  8) == 0) ret = 24;
     else if (strncmp(className,"3BHELS_J",  8) == 0) ret = 24;
@@ -2672,28 +2644,32 @@ int ret = -1;
 
     else if ((dir[3] == '2') && (dir[4] == '7'))   // 2027
     {
-         if (strncmp(className,"1AHELS_S",  8) == 0) ret = 22;
+         if (strncmp(className,"1AHELS",    6) == 0) ret = 22;
+    else if (strncmp(className,"1AHELS_S",  8) == 0) ret = 22;
     else if (strncmp(className,"1AHELS_J",  8) == 0) ret = 22;
     else if (strncmp(className,"1BHELS_S",  8) == 0) ret = 22;
     else if (strncmp(className,"1BHELS_J",  8) == 0) ret = 22;
     else if (strncmp(className,"1CHELS_S",  8) == 0) ret = 22;
     else {if (strncmp(className,"1CHELS_J",  8) == 0) ret = 22;}
 
-         if (strncmp(className,"2AHELS_S",  8) == 0) ret = 23;
+         if (strncmp(className,"2AHELS",    6) == 0) ret = 23;
+    else if (strncmp(className,"2AHELS_S",  8) == 0) ret = 23;
     else if (strncmp(className,"2AHELS_J",  8) == 0) ret = 23;
     else if (strncmp(className,"2BHELS_S",  8) == 0) ret = 23;
     else if (strncmp(className,"2BHELS_J",  8) == 0) ret = 23;
     else if (strncmp(className,"2CHELS_S",  8) == 0) ret = 23;
     else {if (strncmp(className,"2CHELS_J",  8) == 0) ret = 23;}
 
-         if (strncmp(className,"3AHELS_S",  8) == 0) ret = 24;
+         if (strncmp(className,"3AHELS",    6) == 0) ret = 24;
+    else if (strncmp(className,"3AHELS_S",  8) == 0) ret = 24;
     else if (strncmp(className,"3AHELS_J",  8) == 0) ret = 24;
     else if (strncmp(className,"3BHELS_S",  8) == 0) ret = 24;
     else if (strncmp(className,"3BHELS_J",  8) == 0) ret = 24;
     else if (strncmp(className,"3CHELS_S",  8) == 0) ret = 24;
     else {if (strncmp(className,"3CHELS_J",  8) == 0) ret = 24;}
 
-         if (strncmp(className,"4AHELS_S",  8) == 0) ret = 25;
+         if (strncmp(className,"4AHELS",    6) == 0) ret = 25;
+    else if (strncmp(className,"4AHELS_S",  8) == 0) ret = 25;
     else if (strncmp(className,"4AHELS_J",  8) == 0) ret = 25;
     else if (strncmp(className,"4BHELS_S",  8) == 0) ret = 25;
     else if (strncmp(className,"4BHELS_J",  8) == 0) ret = 25;
@@ -2704,35 +2680,40 @@ int ret = -1;
 
     else if ((dir[3] == '2') && (dir[4] == '8'))   // 2028
     {
-         if (strncmp(className,"1AHELS_S",  8) == 0) ret = 22;
+         if (strncmp(className,"1AHELS",    6) == 0) ret = 22;
+    else if (strncmp(className,"1AHELS_S",  8) == 0) ret = 22;
     else if (strncmp(className,"1AHELS_J",  8) == 0) ret = 22;
     else if (strncmp(className,"1BHELS_S",  8) == 0) ret = 22;
     else if (strncmp(className,"1BHELS_J",  8) == 0) ret = 22;
     else if (strncmp(className,"1CHELS_S",  8) == 0) ret = 22;
     else {if (strncmp(className,"1CHELS_J",  8) == 0) ret = 22;}
 
-         if (strncmp(className,"2AHELS_S",  8) == 0) ret = 23;
+         if (strncmp(className,"2AHELS",    6) == 0) ret = 23;
+    else if (strncmp(className,"2AHELS_S",  8) == 0) ret = 23;
     else if (strncmp(className,"2AHELS_J",  8) == 0) ret = 23;
     else if (strncmp(className,"2BHELS_S",  8) == 0) ret = 23;
     else if (strncmp(className,"2BHELS_J",  8) == 0) ret = 23;
     else if (strncmp(className,"2CHELS_S",  8) == 0) ret = 23;
     else {if (strncmp(className,"2CHELS_J",  8) == 0) ret = 23;}
 
-         if (strncmp(className,"3AHELS_S",  8) == 0) ret = 24;
+         if (strncmp(className,"3AHELS",    6) == 0) ret = 24;
+    else if (strncmp(className,"3AHELS_S",  8) == 0) ret = 24;
     else if (strncmp(className,"3AHELS_J",  8) == 0) ret = 24;
     else if (strncmp(className,"3BHELS_S",  8) == 0) ret = 24;
     else if (strncmp(className,"3BHELS_J",  8) == 0) ret = 24;
     else if (strncmp(className,"3CHELS_S",  8) == 0) ret = 24;
     else {if (strncmp(className,"3CHELS_J",  8) == 0) ret = 24;}
 
-         if (strncmp(className,"4AHELS_S",  8) == 0) ret = 25;
+         if (strncmp(className,"4AHELS",    6) == 0) ret = 25;
+    else if (strncmp(className,"4AHELS_S",  8) == 0) ret = 25;
     else if (strncmp(className,"4AHELS_J",  8) == 0) ret = 25;
     else if (strncmp(className,"4BHELS_S",  8) == 0) ret = 25;
     else if (strncmp(className,"4BHELS_J",  8) == 0) ret = 25;
     else if (strncmp(className,"4CHELS_S",  8) == 0) ret = 25;
     else {if (strncmp(className,"4CHELS_J",  8) == 0) ret = 25;}
 
-         if (strncmp(className,"5AHELS_S",  8) == 0) ret = 26;
+         if (strncmp(className,"5AHELS",    6) == 0) ret = 26;
+    else if (strncmp(className,"5AHELS_S",  8) == 0) ret = 26;
     else if (strncmp(className,"5AHELS_J",  8) == 0) ret = 26;
     else if (strncmp(className,"5BHELS_S",  8) == 0) ret = 26;
     else if (strncmp(className,"5BHELS_J",  8) == 0) ret = 26;
