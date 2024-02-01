@@ -1030,6 +1030,15 @@ fclose(protWI);
 
         r = 0; while ((Sub[r] != ' ') && (Sub[r] != '\0')) { r++; } Sub[r] = '\0';
 
+/* TESTS!
+if ((strncmp(FamNam, "Biebl", 5) == 0) && (strncmp(SubNames, "D", 1) == 0))
+{
+    printf("text: %s", text);
+    printf("Biebl Subject: .%s. Sub: %s .%s.\n", Subject, Sub, Date);
+}
+*/
+
+
         for (m = 0; m < i; m++)
         {
 // siehe vorbereitete Zeile: 537 ...   suche nach jj.mm.dd
